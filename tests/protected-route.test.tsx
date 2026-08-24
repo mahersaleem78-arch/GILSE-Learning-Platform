@@ -26,8 +26,6 @@ function renderProtectedRoute(initialPath = '/dashboard') {
 describe('ProtectedRoute', () => {
   it('redirects to /login when no user is present', async () => {
     renderProtectedRoute('/dashboard')
-    // While loading, it shows a spinner; once settled without a user it redirects.
-    // Give it time to resolve the session check.
     expect(await screen.findByText(/Login page/i, {}, { timeout: 3000 })).toBeInTheDocument()
   })
 })

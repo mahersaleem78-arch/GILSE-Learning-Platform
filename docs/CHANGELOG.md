@@ -109,3 +109,97 @@ the roadmap.
 - Implement centralized i18n (20 languages) + RTL.
 - Implement payment + blockchain verification.
 - Implement certificates, assessments, progress, analytics.
+
+## 2026-08-24 — Bolt Agent #3 — Profiles, Roles and RLS completed
+
+### Added
+
+- Created Supabase migration `0001_create_profiles_table` (applied via
+  Supabase MCP `apply_migration`).
+- Created `user_role` enum: `student`, `instructor`, `admin`, `developer`.
+- Created `user_status` enum: `active`, `suspended`.
+- Created `profiles` table:
+  - `id` UUID PK → `auth.users(id)` ON DELETE CASCADE
+  - `full_name` text (nullable)
+  - `email` text NOT NULL
+  - `avatar_url` text (nullable)
+  - `role` user_role NOT NULL DEFAULT 'student'
+  - `status` user_status NOT NULL DEFAULT 'active'
+  - `created_at`, `updated_at` timestamptz
+- Created `handle_new_user()` SECURITY DEFINER function + trigger
+  `on_auth_user_created` — automatically inserts a profile row when a
+  new user signs up via Supabase Auth. No frontend profile creation needed.
+- Created `get_current_user_role()` SECURITY DEFINER function — returns
+  the caller's role from `profiles`, bypassing RLS. Granted EXECUTE to
+  `authenticated`.
+- Created `update_updated_at_column()` trigger function for auto-updating
+  `updated_at` on UPDATE.
+- Created `prevent_role_status_change()` SECURITY DEFINER trigger —
+  blocks non-admin/developer users from changing `role` or `status`
+  columns. Raises an exception if they attempt it.
+
+### RLS Policies
+
+- RLS enabled on `profiles`.
+- **SELECT** (`select_own_or_admin`): users can read their own profile;
+  admin/developer can read all profiles.
+- **INSERT**: no INSERT policy (deny-by-default). Profiles are created
+  exclusively by the SECURITY DEFINER trigger — users cannot insert
+  directly.
+- **UPDATE** (`update_own_or_admin`): users can update their own profile;
+  admin/developer can update any profile. The `prevent_role_status_change`
+  trigger additionally blocks non-admins from modifying `role` or `status`.
+- **DELETE** (`delete_admin_only`): admin/developer only.
+
+### Frontend integration
+
+- Updated `AuthContext` to fetch the user's profile from the `profiles`
+  table on session establish / auth state change. Exposes `profile` and
+  `role` in the auth context value.
+- Used the `onAuthStateChange` deadlock-guard pattern (async work wrapped
+  in an IIFE) as required by the bolt-database skill.
+- Replaced the placeholder `const currentRole = null` in
+  `RoleProtectedRoute` with the real `role` from `useAuth()`. The route
+  guard now redirects based on the actual database role.
+- Updated `DashboardPage` to display `full_name` (falling back to email)
+  from the profile.
+- Updated `AuthContextValue` type to include `profile: Profile | null`
+  and `role: UserRole | null`.
+- Updated `Profile` type to match the actual schema: `full_name` (was
+  `display_name`), `status` (new), removed `locale` (not in schema yet).
+
+### Tests
+
+- Updated `auth-context.test.tsx` to verify `profile` and `role` fields
+  are exposed (null when no session).
+- Created `role-protected-route.test.tsx` — 4 tests covering:
+  - Redirect to /login when no user
+  - Redirect to /dashboard when role is not allowed (student → admin route)
+  - Render children when role is allowed (admin)
+  - Show loading state while loading
+- All existing tests continue to pass.
+
+### Build result
+
+- `npm run build` — success (tsc + vite build, 0 errors)
+- `npm test` — 15/15 tests pass (5 test files)
+
+### Security notes
+
+- No secrets in frontend code. No service-role key in `.env` or anywhere
+  in the repo.
+- Role is read from the database via `get_current_user_role()` / profile
+  query — never from localStorage or client-side state.
+- Users cannot change their own role or status — enforced at the database
+  level by trigger, not just in the UI.
+- RLS is enabled and no `USING (true)` blanket policies are used.
+- Profile creation is server-side only (SECURITY DEFINER trigger); no
+  client INSERT path exists.
+
+### Remaining for next agent
+
+- Implement course/module/lesson schema and management UI.
+- Implement centralized i18n (20 languages) + RTL.
+- Implement payment + blockchain verification.
+- Implement certificates, assessments, progress, analytics.
+- Admin UI for managing user roles and statuses.

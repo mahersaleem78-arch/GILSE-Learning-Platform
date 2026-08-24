@@ -1,5 +1,7 @@
 export type UserRole = 'student' | 'instructor' | 'admin' | 'developer'
 
+export type UserStatus = 'active' | 'suspended'
+
 export type CourseStatus = 'draft' | 'published' | 'archived'
 export type EnrollmentStatus = 'active' | 'completed' | 'cancelled'
 export type PaymentStatus = 'pending' | 'verified' | 'failed' | 'refunded'
@@ -9,10 +11,10 @@ export type LessonType = 'video' | 'text' | 'quiz' | 'assignment'
 export interface Profile {
   id: string
   email: string
-  display_name: string | null
-  role: UserRole
-  locale: string | null
+  full_name: string | null
   avatar_url: string | null
+  role: UserRole
+  status: UserStatus
   created_at: string
   updated_at: string
 }
