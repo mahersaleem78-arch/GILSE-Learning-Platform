@@ -20,9 +20,9 @@ describe('Application routing', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Learning support for every learner/i)
   })
 
-  it('renders the courses page at /courses', () => {
+  it('renders the courses page at /courses', async () => {
     renderApp('/courses')
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Course Catalog/i)
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(/Course Catalog/i)
   })
 
   it('renders the login page at /login', () => {

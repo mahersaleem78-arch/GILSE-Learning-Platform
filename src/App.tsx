@@ -12,6 +12,8 @@ import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import DashboardPage from './pages/DashboardPage'
 import AdminPage from './pages/AdminPage'
+import AdminCoursesPage from './pages/admin/AdminCoursesPage'
+import AdminCourseDetailPage from './pages/admin/AdminCourseDetailPage'
 import CertificatePage from './pages/CertificatePage'
 import NotFoundPage from './pages/NotFoundPage'
 
@@ -54,6 +56,8 @@ export default function App() {
         }
       >
         <Route index element={<AdminPage />} />
+        <Route path="courses" element={<AdminCoursesPage />} />
+        <Route path="courses/:id" element={<AdminCourseDetailPage />} />
       </Route>
 
       {/* 404 */}
