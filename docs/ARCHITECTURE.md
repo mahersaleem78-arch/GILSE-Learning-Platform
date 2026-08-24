@@ -42,7 +42,7 @@ foundation**. There is no application code yet.
 | Layer            | Status                                                                 |
 |------------------|------------------------------------------------------------------------|
 | Documentation    | Complete initial set (AI_CONTEXT, ARCHITECTURE, DATABASE, ROADMAP, CHANGELOG) |
-| Source code      | None — `src/` is planned but empty                                     |
+| Source code      | None — `src/` is planned but empty; only an empty `package-lock.json` scaffold exists |
 | Supabase project | Provisioned; URL and anon key present in `.env`                       |
 | Database schema  | Empty — no tables, no migrations applied                              |
 | Edge Functions   | None deployed                                                          |
@@ -53,7 +53,8 @@ foundation**. There is no application code yet.
 
 ### What does NOT exist
 
-- No `package.json`, no framework, no build tooling.
+- No `package.json` (an empty `package-lock.json` scaffold exists with no
+  dependencies installed), no framework, no build tooling.
 - No routes, components, or styles.
 - No authentication, no RLS policies, no database calls.
 - No course, module, lesson, certificate, or payment systems.

@@ -23,6 +23,8 @@ The previous GILSE website code has intentionally not been imported yet.
 
 - Rewrote `docs/ARCHITECTURE.md` as the production architecture document
   (Bolt Agent #1 — Task 01: Foundation & Architecture Audit).
+- Updated "Current Architecture" section to note the empty
+  `package-lock.json` scaffold (no `package.json`, no dependencies).
 
 ### Added
 
