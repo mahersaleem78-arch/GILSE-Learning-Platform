@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: theme('colors.neutral.50');
+    --color-surface: #ffffff;
+    --color-text: theme('colors.neutral.900');
+    --color-text-muted: theme('colors.neutral.500');
+    --color-border: theme('colors.neutral.200');
+    --color-primary: theme('colors.primary.600');
+    --color-primary-hover: theme('colors.primary.700');
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-900 font-sans antialiased;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-white rounded;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-primary-600 text-white px-5 py-2.5 hover:bg-primary-700 active:bg-primary-800 shadow-sm;
+  }
+  .btn-secondary {
+    @apply btn bg-neutral-100 text-neutral-800 px-5 py-2.5 hover:bg-neutral-200 active:bg-neutral-300;
+  }
+  .btn-outline {
+    @apply btn border border-neutral-300 bg-white text-neutral-800 px-5 py-2.5 hover:bg-neutral-50 hover:border-neutral-400;
+  }
+  .btn-ghost {
+    @apply btn text-neutral-600 px-3 py-2 hover:bg-neutral-100 hover:text-neutral-900;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+  .btn-lg {
+    @apply px-7 py-3.5 text-lg;
+  }
+
+  .card {
+    @apply bg-white rounded-lg border border-neutral-200 shadow-sm;
+  }
+  .card-hover {
+    @apply card transition-all duration-200 hover:shadow-md hover:border-neutral-300;
+  }
+
+  .input {
+    @apply w-full rounded-md border border-neutral-300 bg-white px-3.5 py-2.5 text-neutral-900 placeholder:text-neutral-400 transition-colors focus:border-primary-500 focus:ring-1 focus:ring-primary-500;
+  }
+  .label {
+    @apply block text-sm font-medium text-neutral-700 mb-1.5;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

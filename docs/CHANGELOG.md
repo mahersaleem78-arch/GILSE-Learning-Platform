@@ -55,3 +55,57 @@ The previous GILSE website code has intentionally not been imported yet.
 Architecture documentation is complete. No application code or database
 schema has been created — that work is assigned to subsequent agents per
 the roadmap.
+
+## 2026-08-24 — Bolt Agent #2 — Application Foundation completed
+
+### Added
+
+- Created the full Vite + React + TypeScript + Tailwind CSS application
+  scaffold (`package.json`, `vite.config.ts`, `tsconfig.json`,
+  `tailwind.config.js`, `postcss.config.js`, `index.html`).
+- Created centralized Supabase client (`src/lib/supabase.ts`) using
+  `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` — no secrets in frontend.
+- Created `AuthContext` / `AuthProvider` with `session`, `user`, `loading`,
+  `signIn`, `signUp`, `signOut` backed by Supabase Auth.
+- Created `ProtectedRoute` and `RoleProtectedRoute` (roles: student,
+  admin, developer, instructor) — structurally ready for Task 03.
+- Created four layouts: `PublicLayout`, `AuthLayout`, `StudentLayout`,
+  `AdminLayout`.
+- Created nine pages: Home, Courses, CourseDetail, Login, Signup,
+  Dashboard, Admin, Certificate, NotFound.
+- Created centralized TypeScript types for Profile, Course, Module,
+  Lesson, Enrollment, LessonProgress, Assessment, AssessmentResult,
+  Payment, PaymentVerification, Certificate.
+- Created UI state components: `LoadingState`, `ErrorState`, `EmptyState`.
+- Created `.env.example` with variable names only (no real values).
+- Created test suite: Supabase client, routing, auth context, protected
+  route — 10 tests, all passing.
+- Created responsive design system with 6 color ramps (primary, secondary,
+  accent, success, warning, error) plus neutral tones, 8px spacing,
+  Inter + Plus Jakarta Sans fonts, and animation utilities.
+
+### Routing
+
+- `/` — public landing page
+- `/courses` — public course catalog
+- `/courses/:id` — course detail
+- `/login` — auth login
+- `/signup` — auth signup
+- `/dashboard` — protected student dashboard
+- `/admin` — role-protected admin dashboard
+- `/certificates/:id` — public certificate view
+
+### Build result
+
+- `npm install` — success
+- `npm run build` — success (tsc + vite build, 0 errors)
+- `npm test` — 10/10 tests pass
+
+### Remaining for next agent
+
+- Create `profiles` table + RLS policies (Task 03).
+- Wire `RoleProtectedRoute` to real profile role from database.
+- Implement course/module/lesson schema and management UI.
+- Implement centralized i18n (20 languages) + RTL.
+- Implement payment + blockchain verification.
+- Implement certificates, assessments, progress, analytics.
