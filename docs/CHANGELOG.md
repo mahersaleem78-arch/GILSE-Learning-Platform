@@ -203,3 +203,101 @@ the roadmap.
 - Implement payment + blockchain verification.
 - Implement certificates, assessments, progress, analytics.
 - Admin UI for managing user roles and statuses.
+
+## 2026-08-25 — Bolt Agent #5 — Enrollment + Student Dashboard completed
+
+### Added
+
+- Created Supabase migration `0003_create_enrollments_table` (applied via
+  Supabase MCP `apply_migration`).
+- Created `enrollment_status` enum: `active`, `completed`, `cancelled`.
+- Created `enrollments` table:
+  - `id` UUID PK → default gen_random_uuid()
+  - `student_id` UUID NOT NULL → profiles(id) ON DELETE CASCADE, default auth.uid()
+  - `course_id` UUID NOT NULL → courses(id) ON DELETE CASCADE
+  - `status` enrollment_status NOT NULL DEFAULT 'active'
+  - `enrolled_at` timestamptz NOT NULL DEFAULT now()
+  - `completed_at` timestamptz (nullable)
+  - `created_at`, `updated_at` timestamptz
+- Created UNIQUE index on (student_id, course_id) — prevents duplicate
+  enrollment for the same student/course combination.
+- Created `prevent_enrollment_owner_change()` SECURITY DEFINER trigger —
+  blocks non-admin/developer users from changing `student_id` or `course_id`
+  on UPDATE. Raises an exception if they attempt it.
+- Created enrollment service layer (`src/services/enrollments.ts`):
+  - `enrollStudent()` — checks for existing enrollment, then inserts;
+    handles unique constraint violation (23505) gracefully.
+  - `getStudentEnrollments()` — fetches enrollments with joined course data.
+  - `getEnrollmentByCourse()` — checks enrollment for a specific course.
+  - `isStudentEnrolled()` — boolean check.
+  - `updateEnrollmentStatus()` — updates status and completed_at.
+- Updated `CourseDetailPage` with full enrollment flow:
+  - Shows "Enroll now" button for authenticated, non-enrolled students.
+  - Shows enrolled state with enrollment date and "Go to dashboard" link.
+  - Shows sign-in prompt for unauthenticated users.
+  - Handles loading and error states during enrollment.
+  - Prevents duplicate enrollment (service + DB constraint).
+- Upgraded `DashboardPage` with real Supabase data:
+  - Student profile summary with avatar initial, name, and email.
+  - Enrolled courses with course title, description, thumbnail, hours,
+    enrollment date, enrollment status badge, and "Continue course" action.
+  - Progress placeholder architecture (0% bar) ready for Bolt #7.
+  - Loading, empty, and error states.
+
+### RLS Policies
+
+- RLS enabled on `enrollments`.
+- **SELECT** (`select_own_or_admin`): students read their own enrollments;
+  admin/developer read all.
+- **INSERT** (`insert_own_or_admin`): students can self-enroll
+  (student_id = auth.uid()); admin/developer can enroll anyone.
+- **UPDATE** (`update_own_or_admin`): students update own enrollments;
+  admin/developer update any. Ownership fields (student_id, course_id)
+  protected by trigger.
+- **DELETE** (`delete_admin_only`): admin/developer only.
+
+### Tests
+
+- Created `enrollments-service.test.ts` — 12 tests covering:
+  - enrollStudent check-then-insert flow
+  - duplicate enrollment detection (check + DB constraint)
+  - DB error rethrowing
+  - getStudentEnrollments, getEnrollmentByCourse, isStudentEnrolled
+  - updateEnrollmentStatus with completed_at logic
+- Created `dashboard-page.test.tsx` — 4 tests covering:
+  - Loading state
+  - Empty state with browse-courses action
+  - Enrolled courses display with progress placeholder
+  - Error state with retry
+- Created `course-detail-enrollment.test.tsx` — 5 tests covering:
+  - Sign-in prompt for unauthenticated users
+  - Enroll button for authenticated non-enrolled users
+  - Enrolled state for already-enrolled users
+  - Successful enrollment flow
+  - Enrollment error handling
+- All existing tests continue to pass.
+
+### Build result
+
+- `npm run build` — success (tsc + vite build, 0 errors)
+- `npm test` — 59/59 tests pass (12 test files)
+
+### Security notes
+
+- `student_id` defaults to `auth.uid()` so self-enrollment inserts that
+  omit `student_id` satisfy the INSERT policy's WITH CHECK.
+- Unique constraint is the database-level duplicate-enrollment guard.
+- Ownership fields (student_id, course_id) cannot be changed by students —
+  enforced at the database level by trigger.
+- RLS is enabled and no `USING (true)` blanket policies are used.
+- No secrets in frontend code.
+
+### Remaining for next agent (Bolt #6+)
+
+- Lesson player + lesson progress tracking (Bolt #7).
+- Centralized i18n (20 languages) + RTL.
+- Payment + blockchain verification.
+- Certificates, assessments, analytics.
+- Instructor dashboard.
+- Admin UI for managing user roles and statuses.
+- Production deployment.

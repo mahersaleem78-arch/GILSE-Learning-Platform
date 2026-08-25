@@ -64,6 +64,8 @@ export interface Enrollment {
   status: EnrollmentStatus
   enrolled_at: string
   completed_at: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface LessonProgress {

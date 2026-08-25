@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import type { Course, Module, Lesson } from '@/types'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import type { Course, Module, Lesson, Enrollment } from '@/types'
 import { getCourse } from '@/services/courses'
 import { listModules } from '@/services/modules'
 import { listLessons } from '@/services/lessons'
+import { getEnrollmentByCourse, enrollStudent } from '@/services/enrollments'
+import { useAuth } from '@/contexts/AuthContext'
 import { LoadingState } from '@/components/ui/LoadingState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -13,11 +15,16 @@ type ModuleWithLessons = Module & { lessons: Lesson[] }
 export default function CourseDetailPage() {
   const { id } = useParams<{ id: string }>()
   const courseId = id!
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [course, setCourse] = useState<Course | null>(null)
   const [modules, setModules] = useState<ModuleWithLessons[]>([])
+  const [enrollment, setEnrollment] = useState<Enrollment | null>(null)
   const [loading, setLoading] = useState(true)
+  const [enrolling, setEnrolling] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [enrollError, setEnrollError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -33,15 +40,37 @@ export default function CourseDetailPage() {
           modsWithLessons.push({ ...mod, lessons })
         }
         setModules(modsWithLessons)
+
+        if (user) {
+          const enr = await getEnrollmentByCourse(courseId)
+          setEnrollment(enr)
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load course')
     } finally {
       setLoading(false)
     }
-  }, [courseId])
+  }, [courseId, user])
 
   useEffect(() => { void load() }, [load])
+
+  const handleEnroll = async () => {
+    if (!user) {
+      navigate('/login', { state: { from: `/courses/${courseId}` } })
+      return
+    }
+    setEnrolling(true)
+    setEnrollError(null)
+    try {
+      const enr = await enrollStudent(courseId)
+      setEnrollment(enr)
+    } catch (err) {
+      setEnrollError(err instanceof Error ? err.message : 'Failed to enroll')
+    } finally {
+      setEnrolling(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -68,6 +97,7 @@ export default function CourseDetailPage() {
     (sum, m) => sum + m.lessons.reduce((s, l) => s + (l.duration_minutes ?? 0), 0),
     0,
   )
+  const isEnrolled = enrollment !== null && enrollment.status !== 'cancelled'
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
@@ -103,6 +133,41 @@ export default function CourseDetailPage() {
         <div className="flex items-center gap-2 text-sm font-semibold text-neutral-900">
           {course.price > 0 ? `${course.price} ${course.currency}` : 'Free'}
         </div>
+      </div>
+
+      {/* Enrollment action */}
+      <div className="mt-6">
+        {enrollError && (
+          <div className="mb-4">
+            <ErrorState message={enrollError} />
+          </div>
+        )}
+        {isEnrolled ? (
+          <div className="flex items-center justify-between rounded-lg border border-success-200 bg-success-50 px-5 py-4">
+            <div className="flex items-center gap-3">
+              <svg className="h-5 w-5 text-success-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <div>
+                <p className="font-semibold text-success-900">You are enrolled in this course</p>
+                <p className="text-sm text-success-700">
+                  Enrolled on {new Date(enrollment!.enrolled_at).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+            <Link to="/dashboard" className="btn-primary btn-sm">Go to dashboard</Link>
+          </div>
+        ) : user ? (
+          <button onClick={() => void handleEnroll()} disabled={enrolling} className="btn-primary">
+            {enrolling ? 'Enrolling…' : 'Enroll now'}
+          </button>
+        ) : (
+          <div className="flex flex-col gap-3 rounded-lg border border-primary-200 bg-primary-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-primary-800">Sign in to enroll in this course.</p>
+            <div className="flex gap-2">
+              <Link to="/login" state={{ from: `/courses/${courseId}` }} className="btn-outline btn-sm">Sign in</Link>
+              <Link to="/signup" className="btn-primary btn-sm">Create account</Link>
+            </div>
+          </div>
+        )}
       </div>
 
       {modules.length === 0 ? (

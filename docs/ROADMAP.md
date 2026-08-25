@@ -12,12 +12,12 @@
 
 ## Phase 2 — Core Platform
 
-- [ ] Application foundation
-- [ ] Authentication
-- [ ] User profiles
-- [ ] Course catalog
-- [ ] Course registration
-- [ ] Student dashboard
+- [x] Application foundation
+- [x] Authentication
+- [x] User profiles
+- [x] Course catalog
+- [x] Course registration
+- [x] Student dashboard
 - [ ] Instructor dashboard
 - [ ] Administration area
 
