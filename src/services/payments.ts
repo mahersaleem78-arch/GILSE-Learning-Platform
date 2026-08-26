@@ -1,17 +1,7 @@
 import { supabase } from '@/lib/supabase'
-import type { Payment } from '@/types'
+import type { Payment, PaymentConfig } from '@/types'
 
-export interface PaymentConfig {
-  id: string
-  asset: string
-  network: string
-  wallet_address: string
-  wallet_name: string
-  usdt_contract: string | null
-  qr_enabled: boolean
-  reward_amount: number
-  active: boolean
-}
+export type { PaymentConfig }
 
 export async function getPaymentConfig(): Promise<PaymentConfig> {
   const { data, error } = await supabase.from('payment_config').select('*').eq('active', true).limit(1).single()
@@ -22,6 +12,8 @@ export async function getPaymentConfig(): Promise<PaymentConfig> {
 export async function createPayment(studentId: string, courseId: string, amount: number, referralCode?: string | null): Promise<Payment> {
   const config = await getPaymentConfig()
   if (config.wallet_address.startsWith('CONFIGURE_')) throw new Error('Payment wallet is not configured by the administrator yet.')
+  if (amount <= 0) throw new Error('This course does not require a payment request.')
+
   const { data, error } = await supabase.from('payments').insert({
     student_id: studentId,
     course_id: courseId,
@@ -37,16 +29,24 @@ export async function createPayment(studentId: string, courseId: string, amount:
   return data as Payment
 }
 
+/**
+ * Compatibility helper: transaction hashes are never written by the student client.
+ * The trusted Edge Function validates and persists the hash/status using service role.
+ */
 export async function submitTransaction(paymentId: string, txHash: string): Promise<Payment> {
   const cleanHash = txHash.trim()
   if (!cleanHash || cleanHash.length < 20) throw new Error('Enter a valid transaction hash.')
-  const { data, error } = await supabase.from('payments').update({ tx_hash: cleanHash, status: 'submitted', verification_error: null }).eq('id', paymentId).select('*').single()
+  const result = await verifyTransaction(paymentId, cleanHash)
+  if (!result.verified) throw new Error(result.message)
+  const { data, error } = await supabase.from('payments').select('*').eq('id', paymentId).single()
   if (error) throw new Error(error.message)
   return data as Payment
 }
 
 export async function verifyTransaction(paymentId: string, txHash: string): Promise<{ verified: boolean; message: string }> {
-  const { data, error } = await supabase.functions.invoke('verify-tron-payment', { body: { payment_id: paymentId, tx_hash: txHash.trim() } })
+  const cleanHash = txHash.trim()
+  if (!cleanHash || cleanHash.length < 20) throw new Error('Enter a valid transaction hash.')
+  const { data, error } = await supabase.functions.invoke('verify-tron-payment', { body: { payment_id: paymentId, tx_hash: cleanHash } })
   if (error) throw new Error(error.message)
   return data as { verified: boolean; message: string }
 }
