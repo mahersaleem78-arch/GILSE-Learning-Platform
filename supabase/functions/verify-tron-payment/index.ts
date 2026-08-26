@@ -10,6 +10,17 @@ function response(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: cors })
 }
 
+function decimalToRaw(value: string | number, decimals: number): bigint {
+  const normalized = String(value).trim()
+  if (!/^\d+(\.\d+)?$/.test(normalized)) throw new Error('Invalid payment amount.')
+  const [whole, fraction = ''] = normalized.split('.')
+  if (fraction.length > decimals && /[^0]/.test(fraction.slice(decimals))) {
+    throw new Error('Payment amount has more precision than the token supports.')
+  }
+  const paddedFraction = fraction.slice(0, decimals).padEnd(decimals, '0')
+  return BigInt(whole) * (10n ** BigInt(decimals)) + BigInt(paddedFraction || '0')
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   try {
@@ -46,7 +57,6 @@ Deno.serve(async (req) => {
 
     let tx: any = null
     let fingerprint: string | undefined
-    // Search multiple confirmed pages so a valid transaction is not silently missed after the first 200 transfers.
     for (let page = 0; page < 5 && !tx; page += 1) {
       const url = new URL(`https://api.trongrid.io/v1/accounts/${config.wallet_address}/transactions/trc20`)
       url.searchParams.set('only_confirmed', 'true')
@@ -67,13 +77,15 @@ Deno.serve(async (req) => {
     }
 
     const decimals = Number(tx.token_info?.decimals ?? 6)
+    if (!Number.isInteger(decimals) || decimals < 0 || decimals > 18) throw new Error('Unsupported token precision.')
     const rawValue = BigInt(String(tx.value))
-    const expectedRaw = BigInt(Math.round(Number(payment.amount) * (10 ** decimals)))
+    const expectedRaw = decimalToRaw(payment.amount, decimals)
     const toMatches = String(tx.to ?? '').toLowerCase() === String(config.wallet_address).toLowerCase()
     const tokenMatches = String(tx.token_info?.address ?? '').toLowerCase() === contract.toLowerCase()
-    const amountMatches = rawValue >= expectedRaw
+    const amountMatches = rawValue === expectedRaw
+
     if (!toMatches || !tokenMatches || !amountMatches) {
-      const reason = !toMatches ? 'Recipient wallet does not match.' : !tokenMatches ? 'Token contract does not match USDT on TRON.' : 'Received amount is below the required course price.'
+      const reason = !toMatches ? 'Recipient wallet does not match.' : !tokenMatches ? 'Token contract does not match USDT on TRON.' : 'Received amount must exactly match the required course price.'
       await db.from('payments').update({ tx_hash: txHash, verification_error: reason, status: 'failed' }).eq('id', payment.id)
       return response({ verified: false, message: reason })
     }
@@ -87,6 +99,8 @@ Deno.serve(async (req) => {
       throw enrollmentError
     }
 
+    // Referral attribution is fixed by the database when the payment is created.
+    // The verifier never accepts a referral code from the request body.
     if (payment.referral_code) {
       const { data: referrer } = await db.from('profiles').select('id').eq('referral_code', String(payment.referral_code).toUpperCase()).maybeSingle()
       if (referrer && referrer.id !== payment.student_id) {
