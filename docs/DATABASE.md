@@ -2,46 +2,38 @@
 
 ## Database Platform
 
-Supabase is planned as the primary backend and database platform.
+Supabase/PostgreSQL is the primary backend and database platform.
 
 ## Current Status
 
-The production database schema has not yet been finalized.
+The production database includes profiles, courses/modules/lessons, enrollments, payment configuration, payments, referral configuration/rewards, and audit logging. Payment verification is performed by the deployed `verify-tron-payment` Edge Function.
 
-## Planned Core Entities
+## Payment and Referral Entities
 
-- Users
-- Profiles
-- Courses
-- Course registrations
-- Instructors
-- Learning-support programs
-- Certificates
-- Administrative records
-- Payments, if enabled
+- `payment_config` — active USDT/TRON receiving configuration and referral reward amount.
+- `payments` — student payment requests, course/amount snapshot, destination wallet, transaction hash, verification state and timestamps.
+- `referral_rewards` — $40 referral rewards created only after verified payment and controlled through administrator approval/payout states.
+- `audit_log` — security/audit events for payment verification and administrative activity.
+- `profiles.referral_code` / `profiles.referred_by` — referral attribution.
+- `enrollments` — course access; paid-course enrollment is guarded by verified payment.
 
-## Database Rules
+## Security Rules
 
-1. Never commit passwords or private database credentials.
-2. Never commit Supabase service-role keys.
-3. Never commit API secrets.
-4. Production credentials must remain outside Git.
-5. Database migrations must be documented.
-6. Destructive migrations require explicit review.
-7. Changes to production data structures must be tested before deployment.
+1. Never commit passwords, service-role keys, wallet private keys, or API secrets.
+2. Payment amount, asset, network and receiving wallet are derived from trusted database configuration/course data.
+3. Students cannot set a payment to `verified`; transaction verification is performed server-side by the Edge Function.
+4. Paid-course enrollment requires an existing verified payment for the same student/course.
+5. Transaction hashes are unique.
+6. Referral attribution cannot be changed after signup by students.
+7. Self-referrals and self-referral rewards are rejected at database level.
+8. Referral reward transitions are limited to `pending_approval -> approved/rejected -> paid` and are administrator-only.
+9. RLS and database triggers remain authoritative even if the frontend is bypassed.
+10. Database migrations are committed to `supabase/migrations/` and must be applied before relying on the corresponding protections.
 
-## Future Requirements
+## Payment Flow
 
-The database architecture should support:
+`CourseDetailPage` → payment request → USDT/TRON transfer → transaction hash → `verify-tron-payment` → recipient/token/amount/confirmation checks → payment `verified` → enrollment activation → referral reward creation → audit log.
 
-- Secure authentication
-- Role-based access
-- Students
-- Instructors
-- Administrators
-- Course management
-- Registration
-- Progress tracking
-- Certificates
-- Multilingual content
-- Future integrations
+## Migrations
+
+Payment/referral work is represented by migrations `0003` through `0007`, with `0007` adding paid-enrollment and referral-integrity hardening.
