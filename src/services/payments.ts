@@ -9,7 +9,11 @@ export async function getPaymentConfig(): Promise<PaymentConfig> {
   return data as PaymentConfig
 }
 
-export async function createPayment(studentId: string, courseId: string, amount: number, referralCode?: string | null): Promise<Payment> {
+/**
+ * Creates a payment request. The database is the source of truth for the
+ * course price, payment configuration, and referral attribution.
+ */
+export async function createPayment(studentId: string, courseId: string, amount: number): Promise<Payment> {
   const config = await getPaymentConfig()
   if (config.wallet_address.startsWith('CONFIGURE_')) throw new Error('Payment wallet is not configured by the administrator yet.')
   if (amount <= 0) throw new Error('This course does not require a payment request.')
@@ -17,14 +21,8 @@ export async function createPayment(studentId: string, courseId: string, amount:
   const { data, error } = await supabase.from('payments').insert({
     student_id: studentId,
     course_id: courseId,
-    amount,
-    currency: 'USD',
-    asset: config.asset,
-    network: config.network,
-    wallet_address: config.wallet_address,
-    referral_code: referralCode?.trim().toUpperCase() || null,
-    status: 'pending',
   }).select('*').single()
+
   if (error) throw new Error(error.message)
   return data as Payment
 }
