@@ -27,9 +27,11 @@ export default function PaymentPage() {
     if (!user || !course) return
     setWorking(true); setError(null)
     try {
-      const ref = new URLSearchParams(window.location.search).get('ref') || localStorage.getItem('gilse_referral_code')
-      const p = await createPayment(user.id, course.id, Number(course.price), ref)
-      setPayment(p); localStorage.removeItem('gilse_referral_code')
+      // Referral attribution is fixed at signup and derived by the database.
+      // Never trust a referral code supplied by the payment page URL/localStorage.
+      const p = await createPayment(user.id, course.id, Number(course.price))
+      setPayment(p)
+      localStorage.removeItem('gilse_referral_code')
     } catch (e) { setError(e instanceof Error ? e.message : 'Could not create payment request.') } finally { setWorking(false) }
   }
 
