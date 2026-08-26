@@ -2,6 +2,8 @@
 
 -- Referral attribution is fixed when the student account is created.
 -- Payment creation must never accept a referral code supplied by the browser.
+-- IMPORTANT: payments.referral_code stores the REFERRER'S code, derived from
+-- profiles.referred_by. It must never contain the student's own code.
 CREATE OR REPLACE FUNCTION prepare_payment_insert()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -34,10 +36,12 @@ BEGIN
     RAISE EXCEPTION 'Payment wallet is not configured.';
   END IF;
 
-  SELECT p.referral_code
+  -- Resolve the referrer from the immutable attribution captured at signup.
+  SELECT referrer.referral_code
     INTO ref_code
-    FROM profiles p
-   WHERE p.id = NEW.student_id;
+    FROM profiles student
+    JOIN profiles referrer ON referrer.id = student.referred_by
+   WHERE student.id = NEW.student_id;
 
   NEW.amount := c.price;
   NEW.currency := COALESCE(c.currency, 'USD');
@@ -104,8 +108,7 @@ BEFORE INSERT OR UPDATE ON profiles
 FOR EACH ROW
 EXECUTE FUNCTION prevent_self_referral();
 
--- A payment may only be verified for the same student/course and its referral
--- attribution must already be fixed on the payment record.
+-- A payment's referral attribution is immutable once created.
 CREATE OR REPLACE FUNCTION prevent_payment_referral_mutation()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -170,7 +173,6 @@ BEFORE INSERT OR UPDATE ON enrollments
 FOR EACH ROW
 EXECUTE FUNCTION enforce_paid_course_enrollment();
 
--- Helpful integrity index for the normal paid-course lookup path.
 CREATE INDEX IF NOT EXISTS idx_payments_verified_student_course
   ON payments(student_id, course_id)
   WHERE status = 'verified';
