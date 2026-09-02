@@ -1,0 +1,10 @@
+DROP POLICY IF EXISTS select_courses_public ON courses;
+CREATE POLICY select_courses_public ON courses FOR SELECT TO anon, authenticated USING (status = 'published' OR get_current_user_role() IN ('admin','developer') OR (get_current_user_role() = 'instructor' AND instructor_id = auth.uid()));
+DROP POLICY IF EXISTS select_modules_public ON modules;
+CREATE POLICY select_modules_public ON modules FOR SELECT TO anon, authenticated USING (EXISTS (SELECT 1 FROM courses c WHERE c.id = modules.course_id AND c.status = 'published') OR get_current_user_role() IN ('admin','developer') OR (get_current_user_role() = 'instructor' AND EXISTS (SELECT 1 FROM courses c WHERE c.id = modules.course_id AND c.instructor_id = auth.uid())));
+DROP POLICY IF EXISTS select_lessons_public ON lessons;
+CREATE POLICY select_lessons_public ON lessons FOR SELECT TO anon, authenticated USING (EXISTS (SELECT 1 FROM modules m JOIN courses c ON c.id = m.course_id WHERE m.id = lessons.module_id AND c.status = 'published') OR get_current_user_role() IN ('admin','developer') OR (get_current_user_role() = 'instructor' AND EXISTS (SELECT 1 FROM modules m JOIN courses c ON c.id = m.course_id WHERE m.id = lessons.module_id AND c.instructor_id = auth.uid())));
+DROP POLICY IF EXISTS delete_modules_instructor ON modules;
+CREATE POLICY delete_modules_instructor ON modules FOR DELETE TO authenticated USING (get_current_user_role() IN ('admin','developer') OR (get_current_user_role() = 'instructor' AND EXISTS (SELECT 1 FROM courses c WHERE c.id = course_id AND c.instructor_id = auth.uid() AND c.status = 'draft')));
+DROP POLICY IF EXISTS delete_lessons_instructor ON lessons;
+CREATE POLICY delete_lessons_instructor ON lessons FOR DELETE TO authenticated USING (get_current_user_role() IN ('admin','developer') OR (get_current_user_role() = 'instructor' AND EXISTS (SELECT 1 FROM modules m JOIN courses c ON c.id=m.course_id WHERE m.id = module_id AND c.instructor_id = auth.uid() AND c.status = 'draft')));
