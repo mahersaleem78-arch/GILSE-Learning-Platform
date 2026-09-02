@@ -16,6 +16,7 @@ REVOKE ALL ON TABLE public.audit_log, public.certificates, public.courses, publi
 GRANT SELECT ON public.courses, public.modules TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.courses, public.modules TO authenticated;
 GRANT SELECT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT ON public.payment_config TO authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.payments TO authenticated;
 GRANT SELECT, UPDATE ON public.referral_rewards TO authenticated;
 GRANT SELECT, INSERT ON public.audit_log TO authenticated;
