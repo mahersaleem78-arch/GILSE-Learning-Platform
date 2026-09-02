@@ -7,12 +7,9 @@ const mockedFrom = vi.mocked(supabase.from)
 
 function makeChain(finalData: unknown = null, finalError: unknown = null) {
   const chain: Record<string, (...args: unknown[]) => unknown> = {}
-  chain.select = vi.fn().mockReturnThis()
-  chain.eq = vi.fn().mockReturnThis()
-  chain.in = vi.fn().mockReturnThis()
+  chain.select = vi.fn().mockReturnThis(); chain.eq = vi.fn().mockReturnThis(); chain.in = vi.fn().mockReturnThis()
   chain.order = vi.fn().mockResolvedValue({ data: finalData, error: finalError })
-  chain.insert = vi.fn().mockReturnThis()
-  chain.single = vi.fn().mockResolvedValue({ data: finalData, error: finalError })
+  chain.insert = vi.fn().mockReturnThis(); chain.single = vi.fn().mockResolvedValue({ data: finalData, error: finalError }); chain.maybeSingle = vi.fn().mockResolvedValue({ data: finalData, error: finalError })
   return chain
 }
 
@@ -23,16 +20,14 @@ describe('enrollments service', () => {
     const row = { id: 'e1', student_id: 's1', course_id: 'c1', status: 'active' }
     const chain = makeChain(row); mockedFrom.mockReturnValue(chain as never)
     await expect(getMyEnrollment('s1', 'c1')).resolves.toEqual(row)
-    expect(chain.eq).toHaveBeenCalledWith('student_id', 's1')
-    expect(chain.eq).toHaveBeenCalledWith('course_id', 'c1')
+    expect(chain.eq).toHaveBeenCalledWith('student_id', 's1'); expect(chain.eq).toHaveBeenCalledWith('course_id', 'c1')
   })
 
   it('lists active and completed enrollments with their courses', async () => {
     const row = { id: 'e1', student_id: 's1', course_id: 'c1', status: 'active', courses: { id: 'c1', title: 'Course' } }
     const chain = makeChain([row]); mockedFrom.mockReturnValue(chain as never)
     const result = await listMyEnrollments('s1')
-    expect(result).toEqual([{ ...row, course: row.courses }])
-    expect(chain.in).toHaveBeenCalledWith('status', ['active', 'completed'])
+    expect(result).toEqual([{ ...row, course: row.courses }]); expect(chain.in).toHaveBeenCalledWith('status', ['active', 'completed'])
   })
 
   it('creates an active enrollment for the current student', async () => {
