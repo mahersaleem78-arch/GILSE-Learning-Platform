@@ -31,6 +31,8 @@ jobs:
         run: npm ci
       - name: Dependency audit
         run: npm audit --audit-level=high
+      - name: Validate Supabase migrations
+        run: npm run migrations:check
       - name: Lint
         run: npm run lint
       - name: Typecheck and build
@@ -43,6 +45,7 @@ jobs:
           for round in 1 2 3; do
             echo "=== VALIDATION PASS $round/3 ==="
             npm audit --audit-level=high
+            npm run migrations:check
             npm run lint
             npm run build
             npm test -- --run
