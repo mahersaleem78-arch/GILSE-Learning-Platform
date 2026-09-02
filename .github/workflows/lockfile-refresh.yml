@@ -1,5 +1,6 @@
 name: Refresh npm lockfile
 
+# Keep package-lock.json synchronized with package.json on the server.
 on:
   push:
     branches: [integration]
