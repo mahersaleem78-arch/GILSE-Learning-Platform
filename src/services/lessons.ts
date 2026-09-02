@@ -14,7 +14,31 @@ export type LessonInput = {
 
 export type LessonUpdate = Partial<LessonInput>
 
+type LessonCatalogRow = Omit<Lesson, 'content' | 'video_url'>
+
 export async function listLessons(moduleId: string): Promise<Lesson[]> {
+  const { data, error } = await supabase
+    .from('published_lesson_catalog')
+    .select('id,module_id,title,description,duration_minutes,order_index,is_preview,created_at,updated_at')
+    .eq('module_id', moduleId)
+    .order('order_index', { ascending: true })
+
+  if (error) throw error
+  return ((data ?? []) as LessonCatalogRow[]).map((lesson) => ({ ...lesson, content: null, video_url: null }))
+}
+
+export async function listEnrolledLessons(moduleId: string): Promise<Lesson[]> {
+  const { data, error } = await supabase
+    .from('enrolled_lesson_content')
+    .select('*')
+    .eq('module_id', moduleId)
+    .order('order_index', { ascending: true })
+
+  if (error) throw error
+  return (data ?? []) as Lesson[]
+}
+
+export async function listAdminLessons(moduleId: string): Promise<Lesson[]> {
   const { data, error } = await supabase
     .from('lessons')
     .select('*')
