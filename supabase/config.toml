@@ -1,0 +1,4 @@
+project_id = "ajxtvvnqukxywanrcgsu"
+
+[functions.verify-tron-payment]
+verify_jwt = true
