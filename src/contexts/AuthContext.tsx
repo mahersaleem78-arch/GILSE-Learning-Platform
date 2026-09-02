@@ -72,15 +72,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       return { error: error?.message ?? null }
     },
-    async signUp(email, password) {
-      const referralCode = localStorage.getItem('gilse_referral_code')
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { referral_code: referralCode || undefined } },
-      })
-      return { error: error?.message ?? null }
-    },
     async signOut() {
       await supabase.auth.signOut()
       setProfile(null)
