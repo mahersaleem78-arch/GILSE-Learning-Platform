@@ -54,3 +54,7 @@ Never commit:
 The `integration` branch is the active validation branch. Changes must pass
 linting, type-checking/build, automated tests, dependency auditing, and the
 relevant Supabase security/integrity checks before promotion to `main`.
+
+Database security/RLS migrations are kept in `supabase/migrations/` and must remain synchronized with the deployed Supabase project.
+
+Final validation marker: 2026-09-02.
