@@ -11,10 +11,12 @@ export async function verifyCertificate(certificateNumber: string): Promise<Cert
   const normalized = certificateNumber.trim()
   if (!normalized) return null
 
-  const { data, error } = await supabase.rpc('verify_certificate', {
-    p_certificate_number: normalized,
-  })
+  const { data, error } = await supabase
+    .from('certificate_verification')
+    .select('certificate_number,student_name,course_title,issue_date')
+    .ilike('certificate_number', normalized)
+    .maybeSingle()
 
   if (error) throw error
-  return (data?.[0] as CertificateVerification | undefined) ?? null
+  return (data as CertificateVerification | null) ?? null
 }
