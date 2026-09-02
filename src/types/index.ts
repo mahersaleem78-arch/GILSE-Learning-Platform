@@ -7,7 +7,7 @@ export type PaymentMethod = 'crypto'
 export type RewardStatus = 'pending_approval' | 'approved' | 'paid' | 'rejected'
 
 export interface Profile { id:string; email:string; full_name:string|null; avatar_url:string|null; role:UserRole; status:UserStatus; referral_code:string|null; referred_by:string|null; created_at:string; updated_at:string }
-export interface Course { id:string; title:string; slug:string; description:string|null; thumbnail_url:string|null; price:number; currency:string; total_hours:number; status:CourseStatus; created_by:string|null; instructor_id:string|null; instructor_share_percent:number; created_at:string; updated_at:string }
+export interface Course { id:string; title:string; slug:string; description:string|null; thumbnail_url:string|null; price:number; currency:string; total_hours:number; status:CourseStatus; created_by:string|null; created_at:string; updated_at:string }
 export interface Module { id:string; course_id:string; title:string; description:string|null; order_index:number; created_at:string; updated_at:string }
 export interface Lesson { id:string; module_id:string; title:string; description:string|null; content:string|null; video_url:string|null; duration_minutes:number|null; order_index:number; is_preview:boolean; created_at:string; updated_at:string }
 export interface Enrollment { id:string; student_id:string; course_id:string; status:EnrollmentStatus; enrolled_at:string; completed_at:string|null }
