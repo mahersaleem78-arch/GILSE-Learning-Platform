@@ -41,7 +41,7 @@ SELECT l.id, l.module_id, l.title, l.description, l.content, l.video_url, l.dura
 FROM public.lessons l JOIN public.modules m ON m.id = l.module_id JOIN public.courses c ON c.id = m.course_id
 WHERE c.status = 'published' AND (l.is_preview OR EXISTS (
   SELECT 1 FROM public.enrollments e WHERE e.student_id = auth.uid() AND e.course_id = c.id AND e.status IN ('active','completed')
-) OR private.get_current_user_role() IN ('admin','developer'));
+));
 REVOKE ALL ON TABLE public.enrolled_lesson_content FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON public.enrolled_lesson_content TO anon, authenticated;
 
