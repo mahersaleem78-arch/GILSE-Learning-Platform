@@ -15,17 +15,26 @@ export async function getMyEnrollment(studentId: string, courseId: string): Prom
 }
 
 export async function listMyEnrollments(studentId: string): Promise<EnrollmentWithCourse[]> {
-  const { data, error } = await supabase
+  const { data: enrollmentRows, error: enrollmentError } = await supabase
     .from('enrollments')
-    .select('id,student_id,course_id,status,enrolled_at,completed_at,courses(*)')
+    .select('*')
     .eq('student_id', studentId)
     .in('status', ['active', 'completed'])
     .order('enrolled_at', { ascending: false })
-  if (error) throw new Error(error.message)
+  if (enrollmentError) throw new Error(enrollmentError.message)
 
-  return ((data ?? []) as Array<Enrollment & { courses: Course | null }>).flatMap((row) =>
-    row.courses ? [{ ...row, course: row.courses } as EnrollmentWithCourse] : [],
-  )
+  const enrollments = (enrollmentRows ?? []) as Enrollment[]
+  if (enrollments.length === 0) return []
+
+  const courseIds = [...new Set(enrollments.map((enrollment) => enrollment.course_id))]
+  const { data: courses, error: courseError } = await supabase.from('courses').select('*').in('id', courseIds)
+  if (courseError) throw new Error(courseError.message)
+
+  const courseById = new Map((courses ?? []).map((course) => [course.id, course as Course]))
+  return enrollments.flatMap((enrollment) => {
+    const course = courseById.get(enrollment.course_id)
+    return course ? [{ ...enrollment, course }] : []
+  })
 }
 
 export async function enrollInCourse(studentId: string, courseId: string): Promise<Enrollment> {
