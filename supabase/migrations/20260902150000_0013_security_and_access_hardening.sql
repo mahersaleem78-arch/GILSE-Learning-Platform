@@ -51,8 +51,7 @@ REVOKE ALL ON FUNCTION private.is_current_user_enrolled(uuid) FROM PUBLIC, anon,
 GRANT EXECUTE ON FUNCTION private.is_current_user_enrolled(uuid) TO authenticated;
 
 DROP POLICY IF EXISTS enrollment_student_insert ON public.enrollments;
-CREATE POLICY enrollment_student_insert ON public.enrollments FOR INSERT TO authenticated
-  WITH CHECK (student_id = auth.uid() AND status = 'active' AND completed_at IS NULL);
+CREATE POLICY enrollment_student_insert ON public.enrollments FOR INSERT TO authenticated WITH CHECK (student_id = auth.uid() AND status = 'active' AND completed_at IS NULL);
 
 CREATE OR REPLACE FUNCTION public.normalize_student_enrollment()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
@@ -68,6 +67,7 @@ END;
 $$;
 DROP TRIGGER IF EXISTS enrollments_normalize_student ON public.enrollments;
 CREATE TRIGGER enrollments_normalize_student BEFORE INSERT ON public.enrollments FOR EACH ROW EXECUTE FUNCTION public.normalize_student_enrollment();
+REVOKE ALL ON FUNCTION public.normalize_student_enrollment() FROM PUBLIC, anon, authenticated;
 
 CREATE OR REPLACE FUNCTION public.enforce_paid_course_enrollment()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
