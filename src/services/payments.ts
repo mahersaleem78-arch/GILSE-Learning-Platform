@@ -13,10 +13,9 @@ export async function getPaymentConfig(): Promise<PaymentConfig> {
  * Creates a payment request. The database is the source of truth for the
  * course price, payment configuration, and referral attribution.
  */
-export async function createPayment(studentId: string, courseId: string, amount: number): Promise<Payment> {
+export async function createPayment(studentId: string, courseId: string): Promise<Payment> {
   const config = await getPaymentConfig()
   if (config.wallet_address.startsWith('CONFIGURE_')) throw new Error('Payment wallet is not configured by the administrator yet.')
-  if (amount <= 0) throw new Error('This course does not require a payment request.')
 
   const { data, error } = await supabase.from('payments').insert({
     student_id: studentId,
@@ -28,8 +27,8 @@ export async function createPayment(studentId: string, courseId: string, amount:
 }
 
 /**
- * Compatibility helper: transaction hashes are never written by the student client.
- * The trusted Edge Function validates and persists the hash/status using service role.
+ * Transaction hashes are never written by the student client directly.
+ * The trusted Edge Function validates and persists the hash/status.
  */
 export async function submitTransaction(paymentId: string, txHash: string): Promise<Payment> {
   const cleanHash = txHash.trim()
