@@ -1,0 +1,16 @@
+DROP POLICY IF EXISTS registration_orders_deny_select ON registration_orders;
+CREATE POLICY registration_orders_deny_select ON registration_orders FOR SELECT TO anon, authenticated USING (false);
+DROP POLICY IF EXISTS registration_orders_deny_insert ON registration_orders;
+CREATE POLICY registration_orders_deny_insert ON registration_orders FOR INSERT TO anon, authenticated WITH CHECK (false);
+DROP POLICY IF EXISTS registration_orders_deny_update ON registration_orders;
+CREATE POLICY registration_orders_deny_update ON registration_orders FOR UPDATE TO anon, authenticated USING (false) WITH CHECK (false);
+DROP POLICY IF EXISTS registration_orders_deny_delete ON registration_orders;
+CREATE POLICY registration_orders_deny_delete ON registration_orders FOR DELETE TO anon, authenticated USING (false);
+DROP POLICY IF EXISTS registration_payments_deny_select ON registration_payments;
+CREATE POLICY registration_payments_deny_select ON registration_payments FOR SELECT TO anon, authenticated USING (false);
+DROP POLICY IF EXISTS registration_payments_deny_insert ON registration_payments;
+CREATE POLICY registration_payments_deny_insert ON registration_payments FOR INSERT TO anon, authenticated WITH CHECK (false);
+DROP POLICY IF EXISTS registration_payments_deny_update ON registration_payments;
+CREATE POLICY registration_payments_deny_update ON registration_payments FOR UPDATE TO anon, authenticated USING (false) WITH CHECK (false);
+DROP POLICY IF EXISTS registration_payments_deny_delete ON registration_payments;
+CREATE POLICY registration_payments_deny_delete ON registration_payments FOR DELETE TO anon, authenticated USING (false);
