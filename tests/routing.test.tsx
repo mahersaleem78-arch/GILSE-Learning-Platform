@@ -34,9 +34,9 @@ describe('Application routing', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Sign in/i)
   })
 
-  it('renders the signup page at /signup', () => {
+  it('renders the paid-first signup page at /signup', () => {
     renderApp('/signup')
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Create account/i)
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/التسجيل المدفوع في GILSE/i)
   })
 
   it('renders 404 for unknown routes', () => {
