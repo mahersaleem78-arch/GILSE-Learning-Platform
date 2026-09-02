@@ -5,6 +5,7 @@ on:
     branches: [integration]
     paths:
       - package.json
+      - .github/workflows/lockfile-refresh.yml
   workflow_dispatch:
 
 permissions:
