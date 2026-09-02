@@ -33,7 +33,6 @@ function makeAuthValue(overrides: Partial<AuthContextValue>): AuthContextValue {
     role: null,
     loading: false,
     signIn: vi.fn(),
-    signUp: vi.fn(),
     signOut: vi.fn(),
     ...overrides,
   }
