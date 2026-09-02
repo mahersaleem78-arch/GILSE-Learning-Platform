@@ -10,11 +10,24 @@ async function requireAdmin() {
   return user.id
 }
 
+function isUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
+function isTronTransactionHash(value: string) {
+  return /^[1-9A-HJ-NP-Za-km-z]{20,128}$/.test(value)
+}
+
 export async function listAdminPayments(filters?: { status?: string; search?: string }): Promise<Payment[]> {
   await requireAdmin()
   let query = supabase.from('payments').select('*').order('created_at', { ascending: false })
   if (filters?.status && filters.status !== 'all') query = query.eq('status', filters.status)
-  if (filters?.search) query = query.or(`tx_hash.ilike.%${filters.search}%,id.eq.${filters.search}`)
+  const search = filters?.search?.trim()
+  if (search) {
+    if (isUuid(search)) query = query.eq('id', search)
+    else if (isTronTransactionHash(search)) query = query.ilike('tx_hash', search)
+    else return []
+  }
   const { data, error } = await query
   if (error) throw new Error(error.message)
   return (data ?? []) as Payment[]
@@ -36,7 +49,7 @@ export async function setRewardStatus(id: string, status: 'approved' | 'rejected
   const allowed = (current.status === 'pending_approval' && (status === 'approved' || status === 'rejected')) || (current.status === 'approved' && status === 'paid')
   if (!allowed) throw new Error(`Invalid reward transition: ${current.status} -> ${status}`)
 
-  const patch: Record<string, unknown> = { status, admin_note: adminNote ?? null }
+  const patch: Record<string, unknown> = { status, admin_note: adminNote?.trim() || null }
   if (status === 'approved') { patch.approved_by = actorId; patch.approved_at = new Date().toISOString() }
   if (status === 'paid') patch.paid_at = new Date().toISOString()
 
