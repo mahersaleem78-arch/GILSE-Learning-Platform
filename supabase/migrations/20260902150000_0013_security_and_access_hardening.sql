@@ -12,7 +12,7 @@ CREATE INDEX IF NOT EXISTS idx_certificates_student ON public.certificates(stude
 CREATE INDEX IF NOT EXISTS idx_certificates_course ON public.certificates(course_id);
 ALTER TABLE public.certificates ENABLE ROW LEVEL SECURITY;
 
-REVOKE ALL ON TABLE public.audit_log, public.certificates, public.courses, public.enrollments, public.lessons, public.modules, public.payment_config, public.payments, public.profiles, public.referral_rewards FROM anon, authenticated;
+REVOKE ALL ON TABLE public.audit_log, public.certificates, public.courses, public.enrollments, public.lessons, public.modules, public.payment_config, public.payments, public.profiles, public.referral_rewards FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON public.courses, public.modules TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.courses, public.modules TO authenticated;
 GRANT SELECT, UPDATE, DELETE ON public.profiles TO authenticated;
@@ -30,23 +30,19 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public.lessons TO authenticated;
 DROP VIEW IF EXISTS public.published_lesson_catalog;
 CREATE VIEW public.published_lesson_catalog AS
 SELECT l.id, l.module_id, l.title, l.description, l.duration_minutes, l.order_index, l.is_preview, l.created_at, l.updated_at
-FROM public.lessons l
-JOIN public.modules m ON m.id = l.module_id
-JOIN public.courses c ON c.id = m.course_id
+FROM public.lessons l JOIN public.modules m ON m.id = l.module_id JOIN public.courses c ON c.id = m.course_id
 WHERE c.status = 'published';
+REVOKE ALL ON TABLE public.published_lesson_catalog FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON public.published_lesson_catalog TO anon, authenticated;
 
 DROP VIEW IF EXISTS public.enrolled_lesson_content;
 CREATE VIEW public.enrolled_lesson_content AS
 SELECT l.id, l.module_id, l.title, l.description, l.content, l.video_url, l.duration_minutes, l.order_index, l.is_preview, l.created_at, l.updated_at
-FROM public.lessons l
-JOIN public.modules m ON m.id = l.module_id
-JOIN public.courses c ON c.id = m.course_id
-WHERE c.status = 'published'
-  AND (l.is_preview OR EXISTS (
-    SELECT 1 FROM public.enrollments e
-    WHERE e.student_id = auth.uid() AND e.course_id = c.id AND e.status IN ('active','completed')
-  ) OR private.get_current_user_role() IN ('admin','developer'));
+FROM public.lessons l JOIN public.modules m ON m.id = l.module_id JOIN public.courses c ON c.id = m.course_id
+WHERE c.status = 'published' AND (l.is_preview OR EXISTS (
+  SELECT 1 FROM public.enrollments e WHERE e.student_id = auth.uid() AND e.course_id = c.id AND e.status IN ('active','completed')
+) OR private.get_current_user_role() IN ('admin','developer'));
+REVOKE ALL ON TABLE public.enrolled_lesson_content FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON public.enrolled_lesson_content TO anon, authenticated;
 
 REVOKE ALL ON FUNCTION private.get_current_user_role() FROM PUBLIC, anon, authenticated;
@@ -60,9 +56,7 @@ CREATE POLICY enrollment_student_insert ON public.enrollments FOR INSERT TO auth
 
 CREATE OR REPLACE FUNCTION public.normalize_student_enrollment()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
-DECLARE
-  jwt_role text := current_setting('request.jwt.claim.role', true);
-  course_status public.course_status;
+DECLARE jwt_role text := current_setting('request.jwt.claim.role', true); course_status public.course_status;
 BEGIN
   IF auth.uid() IS NULL AND jwt_role IS DISTINCT FROM 'service_role' THEN RAISE EXCEPTION 'Authentication required.'; END IF;
   IF jwt_role IS DISTINCT FROM 'service_role' AND auth.uid() IS NOT NULL AND NEW.student_id <> auth.uid() AND private.get_current_user_role() NOT IN ('admin','developer') THEN RAISE EXCEPTION 'Students may only create their own enrollments.'; END IF;
@@ -95,11 +89,8 @@ DROP FUNCTION IF EXISTS public.verify_certificate(text);
 DROP VIEW IF EXISTS public.certificate_verification;
 CREATE VIEW public.certificate_verification AS
 SELECT c.certificate_number, p.full_name AS student_name, co.title AS course_title, c.issue_date
-FROM public.certificates c
-JOIN public.profiles p ON p.id = c.student_id
-JOIN public.courses co ON co.id = c.course_id;
-GRANT SELECT ON public.certificate_verification TO anon, authenticated;
-REVOKE ALL ON TABLE public.certificate_verification FROM anon, authenticated;
+FROM public.certificates c JOIN public.profiles p ON p.id = c.student_id JOIN public.courses co ON co.id = c.course_id;
+REVOKE ALL ON TABLE public.certificate_verification FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON public.certificate_verification TO anon, authenticated;
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_payments_tx_hash_lower_unique ON public.payments (lower(tx_hash)) WHERE tx_hash IS NOT NULL;
