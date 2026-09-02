@@ -13,14 +13,13 @@ function TestConsumer() {
       <span data-testid="profile">{String(auth.profile !== null)}</span>
       <span data-testid="role">{String(auth.role)}</span>
       <span data-testid="has-signin">{String(typeof auth.signIn === 'function')}</span>
-      <span data-testid="has-signup">{String(typeof auth.signUp === 'function')}</span>
       <span data-testid="has-signout">{String(typeof auth.signOut === 'function')}</span>
     </div>
   )
 }
 
 describe('AuthContext', () => {
-  it('provides initial loading state and auth methods', () => {
+  it('provides initial loading state and only the supported auth methods', () => {
     render(
       <MemoryRouter>
         <AuthProvider>
@@ -30,7 +29,6 @@ describe('AuthContext', () => {
     )
 
     expect(screen.getByTestId('has-signin')).toHaveTextContent('true')
-    expect(screen.getByTestId('has-signup')).toHaveTextContent('true')
     expect(screen.getByTestId('has-signout')).toHaveTextContent('true')
   })
 
