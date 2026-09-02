@@ -52,3 +52,14 @@ jobs:
         run: npm run build
       - name: Tests
         run: npm test -- --run
+      - name: Three consecutive validation passes
+        run: |
+          set -euo pipefail
+          for round in 1 2 3; do
+            echo "=== VALIDATION PASS $round/3 ==="
+            npm audit --audit-level=high
+            npm run lint
+            npm run build
+            npm test -- --run
+            echo "=== VALIDATION PASS $round/3: CLEAN ==="
+          done
