@@ -14,11 +14,13 @@ function decimalToRaw(value: string | number, decimals: number): bigint {
   const normalized = String(value).trim()
   if (!/^\d+(\.\d+)?$/.test(normalized)) throw new Error('Invalid payment amount.')
   const [whole, fraction = ''] = normalized.split('.')
-  if (fraction.length > decimals && /[^0]/.test(fraction.slice(decimals))) {
-    throw new Error('Payment amount has more precision than the token supports.')
-  }
+  if (fraction.length > decimals && /[^0]/.test(fraction.slice(decimals))) throw new Error('Payment amount has more precision than the token supports.')
   const paddedFraction = fraction.slice(0, decimals).padEnd(decimals, '0')
   return BigInt(whole) * (10n ** BigInt(decimals)) + BigInt(paddedFraction || '0')
+}
+
+function isTronTransactionHash(value: string) {
+  return /^[0-9a-f]{64}$/i.test(value)
 }
 
 Deno.serve(async (req) => {
@@ -40,14 +42,14 @@ Deno.serve(async (req) => {
     const paymentId = String(body.payment_id ?? '').trim()
     const txHash = String(body.tx_hash ?? '').trim()
     if (!paymentId || !txHash) throw new Error('payment_id and tx_hash are required.')
-    if (txHash.length < 20 || txHash.length > 128) throw new Error('Invalid transaction hash.')
+    if (!isTronTransactionHash(txHash)) throw new Error('Invalid TRON transaction hash. Use the 64-character hexadecimal transaction ID.')
 
     const { data: payment, error: paymentError } = await db.from('payments').select('*').eq('id', paymentId).single()
     if (paymentError || !payment) throw new Error('Payment request not found.')
     if (payment.student_id !== user.id) throw new Error('You do not own this payment request.')
     if (payment.status === 'verified') return response({ verified: true, message: 'Payment already verified.' })
 
-    const { data: existingHash } = await db.from('payments').select('id,student_id').eq('tx_hash', txHash).neq('id', payment.id).maybeSingle()
+    const { data: existingHash } = await db.from('payments').select('id,student_id').ilike('tx_hash', txHash).neq('id', payment.id).maybeSingle()
     if (existingHash) throw new Error('This transaction hash has already been submitted for another payment.')
 
     const { data: config } = await db.from('payment_config').select('*').eq('active', true).limit(1).single()
@@ -55,7 +57,7 @@ Deno.serve(async (req) => {
     const contract = String(config.usdt_contract || configuredContract).trim()
     if (!contract) throw new Error('TRON USDT contract is not configured.')
 
-    let tx: any = null
+    let tx: Record<string, unknown> | null = null
     let fingerprint: string | undefined
     for (let page = 0; page < 5 && !tx; page += 1) {
       const url = new URL(`https://api.trongrid.io/v1/accounts/${config.wallet_address}/transactions/trc20`)
@@ -66,7 +68,8 @@ Deno.serve(async (req) => {
       const apiResponse = await fetch(url, { headers: tronGridKey ? { 'TRON-PRO-API-KEY': tronGridKey } : {} })
       if (!apiResponse.ok) throw new Error(`TRON verification service returned ${apiResponse.status}.`)
       const payload = await apiResponse.json()
-      tx = (payload.data ?? []).find((item: any) => String(item.transaction_id).toLowerCase() === txHash.toLowerCase())
+      const candidates = (payload.data ?? []) as Record<string, unknown>[]
+      tx = candidates.find((item) => String(item.transaction_id ?? '').toLowerCase() === txHash.toLowerCase()) ?? null
       fingerprint = payload.meta?.fingerprint
       if (!fingerprint) break
     }
@@ -76,12 +79,12 @@ Deno.serve(async (req) => {
       return response({ verified: false, message: 'Transaction not found or not yet confirmed on TRON.' })
     }
 
-    const decimals = Number(tx.token_info?.decimals ?? 6)
+    const decimals = Number((tx.token_info as Record<string, unknown> | undefined)?.decimals ?? 6)
     if (!Number.isInteger(decimals) || decimals < 0 || decimals > 18) throw new Error('Unsupported token precision.')
     const rawValue = BigInt(String(tx.value))
     const expectedRaw = decimalToRaw(payment.amount, decimals)
     const toMatches = String(tx.to ?? '').toLowerCase() === String(config.wallet_address).toLowerCase()
-    const tokenMatches = String(tx.token_info?.address ?? '').toLowerCase() === contract.toLowerCase()
+    const tokenMatches = String((tx.token_info as Record<string, unknown> | undefined)?.address ?? '').toLowerCase() === contract.toLowerCase()
     const amountMatches = rawValue === expectedRaw
 
     if (!toMatches || !tokenMatches || !amountMatches) {
@@ -99,8 +102,6 @@ Deno.serve(async (req) => {
       throw enrollmentError
     }
 
-    // Referral attribution is fixed by the database when the payment is created.
-    // The verifier never accepts a referral code from the request body.
     if (payment.referral_code) {
       const { data: referrer } = await db.from('profiles').select('id').eq('referral_code', String(payment.referral_code).toUpperCase()).maybeSingle()
       if (referrer && referrer.id !== payment.student_id) {
