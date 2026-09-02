@@ -24,10 +24,14 @@ describe('enrollments service', () => {
   })
 
   it('lists active and completed enrollments with their courses', async () => {
-    const row = { id: 'e1', student_id: 's1', course_id: 'c1', status: 'active', courses: { id: 'c1', title: 'Course' } }
-    const chain = makeChain([row]); mockedFrom.mockReturnValue(chain as never)
+    const enrollment = { id: 'e1', student_id: 's1', course_id: 'c1', status: 'active' }
+    const course = { id: 'c1', title: 'Course' }
+    const enrollmentChain = makeChain([enrollment]); const courseChain = makeChain([course])
+    mockedFrom.mockReturnValueOnce(enrollmentChain as never).mockReturnValueOnce(courseChain as never)
     const result = await listMyEnrollments('s1')
-    expect(result).toEqual([{ ...row, course: row.courses }]); expect(chain.in).toHaveBeenCalledWith('status', ['active', 'completed'])
+    expect(result).toEqual([{ ...enrollment, course }])
+    expect(enrollmentChain.in).toHaveBeenCalledWith('status', ['active', 'completed'])
+    expect(courseChain.in).toHaveBeenCalledWith('id', ['c1'])
   })
 
   it('creates an active enrollment for the current student', async () => {
