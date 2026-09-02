@@ -134,7 +134,7 @@ export default function SignupPage() {
       <aside className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
         <h2 className="font-heading text-lg font-bold text-neutral-900">مزايا {role === 'student' ? 'الطالب' : 'المدرس'}</h2>
         <ul className="mt-4 space-y-3 text-sm text-neutral-700">{roleBenefits[role].map(item => <li key={item} className="flex gap-2"><span className="text-primary-600">✓</span><span>{item}</span></li>)}</ul>
-        {role === 'student' && <div className="mt-6 rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-xs leading-5 text-neutral-600"><strong>بخصوص الشهادات:</strong> شهادة GILSE الرقمية تتضمن رقم شهادة فريد وصفحة تحقق عامة. لا ينبغي وصفها بأنها «معتمدة من جامعة أكسفورد» أو استخدام شعار Oxford إلا إذا كانت هناك شراكة أو اعتماد رسمي موثق من الجامعة. جامعة Oxford نفسها توضح أن شهادات وبرامجها الرسمية تصدر ضمن برامجها ووحداتها المعتمدة. citeturn0search0turn0search2</div>}
+        {role === 'student' && <div className="mt-6 rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-xs leading-5 text-neutral-600"><strong>بخصوص الشهادات:</strong> شهادة GILSE الرقمية تتضمن رقم شهادة فريد وصفحة تحقق عامة. لا ينبغي وصفها بأنها «معتمدة من جامعة أكسفورد» أو استخدام شعار Oxford إلا إذا كانت هناك شراكة أو اعتماد رسمي موثق من الجامعة.</div>}
         {role === 'instructor' && <div className="mt-6 rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-xs leading-5 text-neutral-600">نسبة المدرس ثابتة عند <strong>50%</strong> من قيمة التسجيل المدفوع في دورته. لا يستطيع المدرس تغيير النسبة من الواجهة، والنشر النهائي للدورة يبقى خاضعاً لمراجعة الإدارة.</div>}
       </aside>
     </div>
