@@ -7,9 +7,20 @@ const mockedFrom = vi.mocked(supabase.from)
 
 function makeChain(finalData: unknown = null, finalError: unknown = null) {
   const chain: Record<string, (...args: unknown[]) => unknown> = {}
-  chain.select = vi.fn().mockReturnThis(); chain.eq = vi.fn().mockReturnThis(); chain.in = vi.fn().mockReturnThis()
+  chain.select = vi.fn().mockReturnThis()
+  chain.eq = vi.fn().mockReturnThis()
+  chain.in = vi.fn().mockReturnThis()
   chain.order = vi.fn().mockResolvedValue({ data: finalData, error: finalError })
-  chain.insert = vi.fn().mockReturnThis(); chain.single = vi.fn().mockResolvedValue({ data: finalData, error: finalError }); chain.maybeSingle = vi.fn().mockResolvedValue({ data: finalData, error: finalError })
+  chain.insert = vi.fn().mockReturnThis()
+  chain.single = vi.fn().mockResolvedValue({ data: finalData, error: finalError })
+  chain.maybeSingle = vi.fn().mockResolvedValue({ data: finalData, error: finalError })
+  return chain
+}
+
+function makeCourseQueryChain(finalData: unknown = null, finalError: unknown = null) {
+  const chain: Record<string, (...args: unknown[]) => unknown> = {}
+  chain.select = vi.fn().mockReturnThis()
+  chain.in = vi.fn().mockResolvedValue({ data: finalData, error: finalError })
   return chain
 }
 
@@ -26,7 +37,8 @@ describe('enrollments service', () => {
   it('lists active and completed enrollments with their courses', async () => {
     const enrollment = { id: 'e1', student_id: 's1', course_id: 'c1', status: 'active' }
     const course = { id: 'c1', title: 'Course' }
-    const enrollmentChain = makeChain([enrollment]); const courseChain = makeChain([course])
+    const enrollmentChain = makeChain([enrollment])
+    const courseChain = makeCourseQueryChain([course])
     mockedFrom.mockReturnValueOnce(enrollmentChain as never).mockReturnValueOnce(courseChain as never)
     const result = await listMyEnrollments('s1')
     expect(result).toEqual([{ ...enrollment, course }])
