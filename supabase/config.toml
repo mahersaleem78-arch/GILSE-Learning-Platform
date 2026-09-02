@@ -2,3 +2,9 @@ project_id = "ajxtvvnqukxywanrcgsu"
 
 [functions.verify-tron-payment]
 verify_jwt = true
+
+[functions.verify-registration-payment]
+verify_jwt = false
+
+[functions.complete-registration]
+verify_jwt = false
