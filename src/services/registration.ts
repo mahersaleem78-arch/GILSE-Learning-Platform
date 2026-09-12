@@ -32,7 +32,15 @@ export async function createRegistrationOrder(input: {
 }
 
 export async function getRegistrationPaymentConfig() {
-  const { data, error } = await supabase.from('payment_config').select('*').eq('active', true).limit(1).single()
+  // Registration happens before authentication, so anon must be able to read
+  // only the public payment destination fields. Do not use select('*):
+  // payment_config contains admin-only settings such as reward_amount.
+  const { data, error } = await supabase
+    .from('payment_config')
+    .select('wallet_address,network,asset,qr_enabled')
+    .eq('active', true)
+    .limit(1)
+    .single()
   if (error) throw new Error(error.message)
   if (String(data.wallet_address).startsWith('CONFIGURE_')) throw new Error('Payment wallet is not configured by the administrator yet.')
   return data as { wallet_address: string; network: string; asset: string; qr_enabled: boolean }
