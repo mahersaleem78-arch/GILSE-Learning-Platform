@@ -41,9 +41,24 @@ export default function SignupPage() {
   const [working, setWorking] = useState(false)
 
   useEffect(() => {
-    const ref = new URLSearchParams(window.location.search).get('ref')?.trim().toUpperCase()
+    const params = new URLSearchParams(window.location.search)
+    const ref = params.get('ref')?.trim().toUpperCase()
+    const requestedCourseId = params.get('course')?.trim()
     if (ref && /^GILSE-[A-Z0-9]{8}$/.test(ref)) setReferralCode(ref)
-    listPublishedCourses().then(setCourses).catch(() => setCourses([]))
+
+    let cancelled = false
+    void listPublishedCourses()
+      .then((publishedCourses) => {
+        if (cancelled) return
+        setCourses(publishedCourses)
+        if (requestedCourseId && publishedCourses.some(c => c.id === requestedCourseId && c.price > 0)) {
+          setCourseId(requestedCourseId)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setCourses([])
+      })
+    return () => { cancelled = true }
   }, [])
 
   const selectedCourse = courses.find(course => course.id === courseId)
