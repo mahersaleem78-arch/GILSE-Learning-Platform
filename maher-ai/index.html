@@ -38,4 +38,75 @@ function addKnowledge(){db.knowledge.unshift({t:kt.value,c:kc.value,s:ks.value})
 function renderAgent(){agent.innerHTML='<div class="card chat"><div class="messages" id="msgs">'+db.messages.map(m=>'<div class="msg '+m.role+'">'+esc(m.text)+'</div>').join('')+'</div><div class="chatbar"><input id="chatInput" placeholder="Ask Maher AI..."><button class="btn" onclick="sendChat()">Send</button></div></div>'}
 function sendChat(){let q=chatInput.value.trim();if(!q)return;db.messages.push({role:'user',text:q});let l=q.toLowerCase(),a;if(/job|وظيف|عمل|career/.test(l))a='ابدأ من Jobs: أضف نص الشاغر كما هو وسأحسب تطابقا أوليا بناء على مهارات ملفك الحالي. التطابق ليس ضمانا للقبول.';else if(/money|income|دخل|مال|business|مشروع/.test(l))a='استخدم Opportunity Lab. سأحوّل الفكرة إلى فرضية ثم اختبار صغير منخفض التكلفة بدل افتراض النجاح.';else if(/cv|سيرة/.test(l))a='ملفك الحالي هو Master Profile. بعد إضافة الخبرات والتعليم والشهادات يمكن بناء نسخ مخصصة لكل شاغر.';else a='فهمت طلبك. الوضع المحلي لا يستخدم API مدفوعا؛ حاليا أستطيع تنظيم بياناتك والمطابقة والتخطيط. يمكن إضافة نموذج اختياري لاحقا.';db.messages.push({role:'agent',text:a});save();renderAgent();chatInput.value=''}
 nav('dashboard');
+
+/* MAHER AI autonomous backend layer */
+const MAHER_SUPABASE_URL="https://ajxtvvnqukxywanrcgsu.supabase.co";
+const MAHER_SUPABASE_KEY="sb_publishable_t-KX-hKNzjD6viWVp7V5VA_h0FBCVlU";
+let MAHER_SESSION=null, MAHER_TASKS=[], MAHER_PROFILE=null;
+
+function maherAuthUI(){
+  if(document.getElementById("maher-auth")) return;
+  const x=document.createElement("div");x.id="maher-auth";x.style="position:fixed;inset:0;background:#02060ddd;z-index:99;display:flex;align-items:center;justify-content:center;padding:20px";
+  x.innerHTML='<div style="max-width:420px;width:100%;background:#0d1b2d;border:1px solid #1d3550;border-radius:16px;padding:22px"><h2>Maher <span style="color:#62d5c7">AI</span></h2><p class="muted">سجل الدخول حتى يحفظ الوكيل مهامه وذاكرته على الخادم</p><input id="mai-email" placeholder="البريد الإلكتروني" style="width:100%;margin:7px 0;padding:11px;background:#081524;color:#fff;border:1px solid #1d3550;border-radius:9px"><input id="mai-pass" type="password" placeholder="كلمة المرور" style="width:100%;margin:7px 0;padding:11px;background:#081524;color:#fff;border:1px solid #1d3550;border-radius:9px"><div class="actions"><button class="btn" id="mai-login">دخول</button><button class="btn secondary" id="mai-signup">إنشاء حساب</button></div><p id="mai-msg" class="small muted"></p></div>';
+  document.body.appendChild(x);
+  const sbc=supabase.createClient(MAHER_SUPABASE_URL,MAHER_SUPABASE_KEY);
+  window.MAHER_SB=sbc;
+  document.getElementById("mai-login").onclick=async()=>{try{const {error}=await sbc.auth.signInWithPassword({email:document.getElementById("mai-email").value,password:document.getElementById("mai-pass").value});if(error)throw error;await maherBoot()}catch(e){document.getElementById("mai-msg").textContent=e.message}};
+  document.getElementById("mai-signup").onclick=async()=>{try{const {error}=await sbc.auth.signUp({email:document.getElementById("mai-email").value,password:document.getElementById("mai-pass").value});if(error)throw error;document.getElementById("mai-msg").textContent="تم إنشاء الحساب؛ إذا ظهر طلب تأكيد افتح بريدك ثم سجل الدخول."}catch(e){document.getElementById("mai-msg").textContent=e.message}};
+}
+async function maherCall(path,options={}){
+  const {data:{session}}=await MAHER_SB.auth.getSession();if(!session)throw Error("يرجى تسجيل الدخول");
+  const r=await fetch(MAHER_SUPABASE_URL+"/functions/v1/maher-ai-agent/"+path,{...options,headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});
+  const j=await r.json();if(!r.ok)throw Error(j.error||"Backend error");return j;
+}
+async function maherBoot(){
+  const {data:{session}}=await MAHER_SB.auth.getSession();
+  if(!session){maherAuthUI();return}
+  MAHER_SESSION=session;const a=document.getElementById("maher-auth");if(a)a.style.display="none";
+  try{MAHER_PROFILE=(await maherCall("profile")).data;MAHER_TASKS=(await maherCall("tasks")).data||[]}catch(e){}
+  const old=document.querySelector(".pill");if(old)old.textContent="Agent online";
+  render("dashboard");
+}
+function addAgentControls(){
+  if(document.querySelector('[data-page="wallet"]'))return;
+  const n=document.getElementById("nav");if(n){const b=document.createElement("button");b.dataset.page="wallet";b.textContent="Wallet / Receive Only";b.onclick=()=>nav("wallet");n.appendChild(b)}
+  const sec=document.querySelector(".side .notice");if(sec)sec.innerHTML="<b>Autonomous mode</b><br>Planning • research • experiments • service creation<br><br><b>Financial lock</b><br>Receive only • no withdrawals • no transfers • no trading";
+  const sec2=document.createElement("section");sec2.id="wallet";sec2.className="page hidden";document.querySelector(".main").insertBefore(sec2,document.querySelector(".footer"));
+}
+async function agentTask(q){
+  const created=await maherCall("tasks",{method:"POST",body:JSON.stringify({instruction:q})});
+  const run=await maherCall("tasks/"+created.data.id+"/run",{method:"POST",body:"{}"});
+  MAHER_TASKS.unshift(run.data);
+  return run.data;
+}
+function renderAgent(){
+  agent.innerHTML='<div class="card chat"><div class="messages" id="msgs">'+db.messages.map(m=>'<div class="msg '+m.role+'">'+esc(m.text)+'</div>').join('')+'</div><div class="chatbar"><input id="chatInput" placeholder="اعطني الهدف وليس الخطوات... مثال: ابتكر خدمة اقدر ابيعها بخبرتي"><button class="btn" onclick="sendChat()">Run</button></div></div>';
+}
+async function sendChat(){
+  const q=chatInput.value.trim();if(!q)return;
+  db.messages.push({role:"user",text:q});save();renderAgent();
+  try{
+    const task=await agentTask(q);
+    const r=task.result||{};
+    let out="نفذت المهمة على محرك الوكيل.\n\nنوع المهمة: "+(r.type||"general")+"\n";
+    if(r.plan?.steps)out+="\nخطة التنفيذ:\n"+r.plan.steps.map((x,i)=>(i+1)+". "+x).join("\n");
+    if(r.actions?.[0]?.ideas)out+="\n\nأفكار قابلة للاختبار:\n"+r.actions[0].ideas.map(x=>"• "+x.name+" — "+x.offer+"\n  الاختبار: "+x.test).join("\n");
+    if(r.llm)out+="\n\nالتحليل الإبداعي:\n"+r.llm;
+    out+="\n\nالقاعدة المالية: استقبال فقط؛ لا سحب ولا تحويل ولا تداول.";
+    db.messages.push({role:"agent",text:out});save();renderAgent();
+    if(document.getElementById("tasks"))render("tasks");
+  }catch(e){db.messages.push({role:"agent",text:"تعذر تنفيذ المهمة: "+e.message});save();renderAgent()}
+}
+function renderTasks(){
+  tasks.innerHTML='<div class="card span12"><h2>Autonomous Tasks</h2><p class="muted">المهام التي أنشأها الوكيل وخططها ونتائجها.</p><div class="list">'+(MAHER_TASKS.length?MAHER_TASKS.map(t=>'<div class="item"><h3>'+esc(t.title)+'</h3><p class="small muted">'+esc(t.task_type)+' · '+esc(t.status)+'</p><p>'+esc(t.instruction)+'</p><button class="btn secondary" onclick="rerunTask(\''+t.id+'\')">Run again</button></div>').join(''):'<div class="muted">لا توجد مهام محفوظة بعد.</div>')+'</div></div>';
+}
+async function rerunTask(id){try{const r=await maherCall("tasks/"+id+"/run",{method:"POST",body:"{}"});MAHER_TASKS.unshift(r.data);renderTasks()}catch(e){alert(e.message)}}
+function renderWallet(){
+  wallet.innerHTML='<div class="grid"><div class="card span7"><h2>Receive Wallet</h2><p class="muted">يسجل الوكيل عنوان الاستلام فقط. لا نضع مفتاحًا خاصًا داخل التطبيق.</p><div class="field"><label>Receive address</label><input id="waddr" placeholder="ضع عنوان الاستلام هنا"></div><div class="field"><label>Network</label><input id="wnet" placeholder="الشبكة"></div><div class="field"><label>Asset</label><input id="wasset" placeholder="الأصل"></div><div class="field"><label><input id="wen" type="checkbox"> تفعيل الاستقبال</label></div><button class="btn" onclick="saveWallet()">Save receive settings</button></div><div class="card span5"><h2>Financial Lock</h2><p><span class="badge">RECEIVE ONLY</span></p><p>Withdrawals: <b>BLOCKED</b></p><p>Transfers: <b>BLOCKED</b></p><p>Trading: <b>BLOCKED</b></p><p class="small muted">التحويل يكون مباشرة إلى عنوان الاستلام الذي تسجله أنت؛ الوكيل لا يملك مفاتيح أو صلاحية سحب.</p></div></div>';
+  loadWallet();
+}
+async function loadWallet(){try{const r=await maherCall("wallet");if(r.data){waddr.value=r.data.receive_address||"";wnet.value=r.data.network||"";wasset.value=r.data.asset||"";wen.checked=!!r.data.enabled}}catch(e){}}
+async function saveWallet(){try{await maherCall("wallet",{method:"POST",body:JSON.stringify({receive_address:waddr.value,network:wnet.value,asset:wasset.value,enabled:wen.checked})});alert("تم حفظ إعدادات الاستلام فقط")}catch(e){alert(e.message)}}
+const oldRender=render;render=function(p){if(p==="tasks")return renderTasks();if(p==="wallet")return renderWallet();return oldRender(p)};
+addAgentControls();maherAuthUI();maherBoot();
 </script></body></html>
