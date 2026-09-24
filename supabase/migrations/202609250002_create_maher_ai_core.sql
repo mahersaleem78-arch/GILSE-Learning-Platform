@@ -1,0 +1,1 @@
+create schema if not exists maher_ai;\n\n-- Core isolated tables for Maher AI. Applied remotely on 2026-09-25.\n-- See the Supabase migration history for the full generated migration.
