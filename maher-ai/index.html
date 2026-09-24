@@ -1,112 +1,111 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Maher AI — Career & Opportunity Agent</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<title>Maher AI — Autonomous Agent</title>
 <style>
-:root{--bg:#07111f;--panel:#0d1b2d;--panel2:#10233a;--text:#e8f0f7;--muted:#9db0c4;--line:#1d3550;--accent:#62d5c7;--danger:#ff8b8b}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Arial;background:linear-gradient(145deg,#07111f,#091a2b);color:var(--text);min-height:100vh}
-.app{display:grid;grid-template-columns:245px 1fr;min-height:100vh}.side{border-right:1px solid var(--line);padding:22px 15px;background:#07111fee;position:sticky;top:0;height:100vh}.brand{font-weight:800;font-size:21px}.brand span{color:var(--accent)}.tag{font-size:12px;color:var(--muted);margin:6px 0 25px}.nav button{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--muted);padding:11px;border-radius:9px;margin:3px 0}.nav button.active,.nav button:hover{background:var(--panel2);color:var(--text)}.main{padding:26px;max-width:1450px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:20px}.title h1{font-size:29px;margin:0}.title p{margin:6px 0;color:var(--muted)}.pill{border:1px solid var(--line);padding:8px 11px;border-radius:999px;color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:15px}.card{background:linear-gradient(180deg,var(--panel),#0a1727);border:1px solid var(--line);border-radius:15px;padding:18px}.span3{grid-column:span 3}.span4{grid-column:span 4}.span6{grid-column:span 6}.span8{grid-column:span 8}.span12{grid-column:span 12}.metric{font-size:28px;font-weight:800;margin-top:5px}.muted{color:var(--muted)}.small{font-size:12px}.btn{background:var(--accent);color:#04201d;border:0;padding:10px 14px;border-radius:9px;font-weight:750;cursor:pointer}.btn.secondary{background:#142a43;color:var(--text);border:1px solid var(--line)}.btn.danger{background:#482329;color:#ffd9d9}.actions{display:flex;gap:8px;flex-wrap:wrap}.field{margin:10px 0}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.field input,.field textarea,.field select{width:100%;background:#081524;border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px}.field textarea{min-height:105px;resize:vertical}.list{display:grid;gap:10px}.item{border:1px solid var(--line);border-radius:11px;padding:12px;background:#0a1727}.item h3{margin:0 0 5px;font-size:15px}.item p{margin:5px 0}.badge{display:inline-block;border:1px solid #28506e;background:#10283e;color:#a9d9ff;border-radius:999px;padding:4px 8px;font-size:11px;margin:2px}.score{height:8px;background:#07111f;border-radius:99px;overflow:hidden}.score i{display:block;height:100%;background:var(--accent)}.chat{display:flex;flex-direction:column;height:550px}.messages{flex:1;overflow:auto;display:flex;flex-direction:column;gap:9px;padding:5px}.msg{max-width:85%;padding:11px 13px;border-radius:13px;line-height:1.5}.msg.user{align-self:flex-end;background:#16453f}.msg.agent{align-self:flex-start;background:#12253b;border:1px solid var(--line)}.chatbar{display:flex;gap:8px;margin-top:10px}.chatbar input{flex:1;background:#081524;border:1px solid var(--line);color:var(--text);padding:12px;border-radius:10px}.hidden{display:none}.notice{border-left:3px solid var(--accent);padding:10px 12px;background:#0c2230;border-radius:8px}.footer{margin-top:25px;color:var(--muted);font-size:11px;text-align:center}@media(max-width:900px){.app{grid-template-columns:1fr}.side{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--line)}.nav{display:flex;overflow:auto}.nav button{min-width:max-content}.main{padding:15px}.span3,.span4,.span6,.span8{grid-column:span 12}}
-</style></head>
-<body><div class="app"><aside class="side"><div class="brand">Maher <span>AI</span></div><div class="tag">Career • Research • Business • Opportunity</div><div class="nav" id="nav">
-<button class="active" data-page="dashboard">Dashboard</button><button data-page="profile">My Profile</button><button data-page="jobs">Jobs</button><button data-page="applications">Applications</button><button data-page="business">Opportunity Lab</button><button data-page="research">Research</button><button data-page="knowledge">Knowledge Base</button><button data-page="agent">AI Agent</button></div><div class="notice small" style="margin-top:18px">Zero-cost core. Your data stays in this browser until an optional backend is connected.</div></aside>
-<main class="main"><div class="top"><div class="title"><h1 id="pageTitle">Maher AI</h1><p id="pageSub">Personal career and opportunity command center</p></div><div class="actions"><span class="pill">Local mode</span><button class="btn secondary" id="lang">العربية</button></div></div>
-<section id="dashboard" class="page"></section><section id="profile" class="page hidden"></section><section id="jobs" class="page hidden"></section><section id="applications" class="page hidden"></section><section id="business" class="page hidden"></section><section id="research" class="page hidden"></section><section id="knowledge" class="page hidden"></section><section id="agent" class="page hidden"></section><div class="footer">Maher AI • provider-agnostic • no paid API required for the core workspace</div></main></div>
+:root{--bg:#06101d;--panel:#0d1b2d;--panel2:#10253d;--text:#edf5fb;--muted:#9db0c4;--line:#1d3550;--accent:#62d5c7;--danger:#ff8b8b;--warn:#ffd27d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#12304b55,transparent 35%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Arial;min-height:100vh}
+.app{display:grid;grid-template-columns:245px 1fr;min-height:100vh}.side{border-left:1px solid var(--line);padding:20px 14px;background:#06101df2;position:sticky;top:0;height:100vh}.brand{font-weight:900;font-size:23px}.brand b{color:var(--accent)}.tag{font-size:12px;color:var(--muted);margin:5px 0 24px}.nav button{display:block;width:100%;text-align:right;background:transparent;border:0;color:var(--muted);padding:11px;border-radius:9px;margin:3px 0;cursor:pointer}.nav button.active,.nav button:hover{background:var(--panel2);color:var(--text)}.main{padding:22px;max-width:1450px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.title h1{font-size:28px;margin:0}.title p{margin:5px 0;color:var(--muted)}.pill{border:1px solid var(--line);padding:8px 11px;border-radius:999px;color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{background:linear-gradient(180deg,var(--panel),#091625);border:1px solid var(--line);border-radius:15px;padding:17px}.s3{grid-column:span 3}.s4{grid-column:span 4}.s6{grid-column:span 6}.s8{grid-column:span 8}.s12{grid-column:span 12}.metric{font-size:28px;font-weight:850}.muted{color:var(--muted)}.small{font-size:12px}.btn{background:var(--accent);color:#04201d;border:0;padding:10px 14px;border-radius:9px;font-weight:800;cursor:pointer}.btn.secondary{background:#142a43;color:var(--text);border:1px solid var(--line)}.actions{display:flex;gap:8px;flex-wrap:wrap}.field{margin:10px 0}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.field input,.field textarea,.field select{width:100%;background:#081524;border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px}.field textarea{min-height:110px;resize:vertical}.hidden{display:none!important}.list{display:grid;gap:10px}.item{border:1px solid var(--line);border-radius:11px;padding:12px;background:#0a1727}.item h3{margin:0 0 6px;font-size:15px}.badge{display:inline-block;border:1px solid #28506e;background:#10283e;color:#a9d9ff;border-radius:999px;padding:4px 8px;font-size:11px;margin:2px}.notice{border-right:3px solid var(--accent);padding:10px 12px;background:#0c2230;border-radius:8px}.chat{display:flex;flex-direction:column;height:600px}.messages{flex:1;overflow:auto;display:flex;flex-direction:column;gap:9px;padding:5px}.msg{max-width:88%;padding:11px 13px;border-radius:13px;line-height:1.55;white-space:pre-wrap}.msg.user{align-self:flex-start;background:#16453f}.msg.agent{align-self:flex-end;background:#12253b;border:1px solid var(--line)}.chatbar{display:flex;gap:8px;margin-top:10px}.chatbar input{flex:1;background:#081524;border:1px solid var(--line);color:var(--text);padding:12px;border-radius:10px}.status{font-size:12px;color:var(--muted);margin-top:8px}.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:22px}@media(max-width:900px){.app{display:block}.side{position:relative;height:auto;border-left:0;border-bottom:1px solid var(--line)}.nav{display:flex;overflow:auto}.nav button{min-width:max-content}.main{padding:12px}.s3,.s4,.s6,.s8{grid-column:span 12}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+<div class="brand">Maher <b>AI</b></div>
+<div class="tag">Autonomous • Multi-model • Research • Career • Business</div>
+<div class="nav" id="nav">
+<button class="active" data-page="dashboard">لوحة القيادة</button>
+<button data-page="agent">الوكيل</button>
+<button data-page="tasks">المهام</button>
+<button data-page="profile">الملف الشخصي</button>
+<button data-page="jobs">الوظائف</button>
+<button data-page="research">البحث</button>
+<button data-page="business">الخدمات والأعمال</button>
+</div>
+<div class="notice small">العقل الأساسي سحابي. يمكن إضافة مزودي GPT وClaude وGemini من الخادم دون كشف مفاتيحهم للمتصفح.</div>
+</aside>
+<main class="main">
+<div class="top"><div class="title"><h1 id="title">Maher AI</h1><p id="sub">وكيل شخصي لتنفيذ الأهداف وليس مجرد دردشة</p></div><span class="pill" id="connection">غير متصل</span></div>
+<section id="dashboard" class="page"></section>
+<section id="agent" class="page hidden"></section>
+<section id="tasks" class="page hidden"></section>
+<section id="profile" class="page hidden"></section>
+<section id="jobs" class="page hidden"></section>
+<section id="research" class="page hidden"></section>
+<section id="business" class="page hidden"></section>
+<div class="footer">Maher AI • Cloud-first • Multi-model ready • لا معاملات مالية داخل الوكيل</div>
+</main></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const KEY='maher-ai-v1';const defaults={profile:{name:'Maher Wael Salem',title:'Mechanical Engineer | Procurement • Operations • MEAL • Data • Technical Sales',location:'Syria / International Availability',skills:['Procurement','P2P / ERP','Project Coordination','MEAL','Data Analytics','Excel','Power BI','BOQ / Cost Estimation','Technical Sales','Engineering'],languages:['Arabic','English']},jobs:[],applications:[],ideas:[],research:[],knowledge:[],messages:[{role:'agent',text:'مرحبا مهندس ماهر 👋 أنا Maher AI. حاليا أعمل بوضع مجاني محلي. فيني أساعدك بتنظيم السيرة الذاتية والوظائف والفرص التجارية وتحويل أي فكرة إلى خطة اختبار عملية.'}]};let db=JSON.parse(localStorage.getItem(KEY)||'null')||structuredClone(defaults);let arabic=false;
-function save(){localStorage.setItem(KEY,JSON.stringify(db))}function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function nav(page){document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));document.getElementById(page).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));render(page)}
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>nav(b.dataset.page));document.getElementById('lang').onclick=()=>{arabic=!arabic;render(document.querySelector('.page:not(.hidden)').id)};
-function metric(n,l){return '<div class="card span3"><div class="muted small">'+l+'</div><div class="metric">'+n+'</div></div>'}
-function render(p){if(p==='dashboard')renderDashboard();if(p==='profile')renderProfile();if(p==='jobs')renderJobs();if(p==='applications')renderApplications();if(p==='business')renderBusiness();if(p==='research')renderResearch();if(p==='knowledge')renderKnowledge();if(p==='agent')renderAgent()}
-function renderDashboard(){dashboard.innerHTML='<div class="grid">'+metric(db.jobs.length,'Saved jobs')+metric(db.applications.length,'Applications')+metric(db.ideas.length,'Business ideas')+metric(db.knowledge.length,'Knowledge notes')+'<div class="card span8"><h2>Command center</h2><p class="muted">Start from your profile, then add jobs or ideas. The local engine produces transparent matches and experiments without a paid AI API.</p><div class="actions"><button class="btn" onclick="nav(\'profile\')">Complete profile</button><button class="btn secondary" onclick="nav(\'jobs\')">Add a job</button><button class="btn secondary" onclick="nav(\'business\')">Find an opportunity</button></div></div><div class="card span4"><h2>System</h2><p><span class="badge">Local storage</span><span class="badge">No paid API</span><span class="badge">RAG-ready</span></p><p class="small muted">Later: Supabase sync, web research connectors, multilingual voice and optional model providers.</p></div><div class="card span12"><h2>Next actions</h2><div class="list"><div class="item"><b>1.</b> Keep the master profile complete.</div><div class="item"><b>2.</b> Add real vacancies and paste requirements.</div><div class="item"><b>3.</b> Record outcomes so the agent can learn from applications and business tests.</div></div></div></div>'}
-function renderProfile(){profile.innerHTML='<div class="grid"><div class="card span8"><h2>Master profile</h2><div class="field"><label>Name</label><input id="pname" value="'+esc(db.profile.name)+'"></div><div class="field"><label>Professional headline</label><input id="ptitle" value="'+esc(db.profile.title)+'"></div><div class="field"><label>Location / availability</label><input id="ploc" value="'+esc(db.profile.location)+'"></div><div class="field"><label>Skills — one per line</label><textarea id="pskills">'+esc(db.profile.skills.join('\n'))+'</textarea></div><div class="field"><label>Languages — one per line</label><textarea id="plangs">'+esc(db.profile.languages.join('\n'))+'</textarea></div><button class="btn" onclick="saveProfile()">Save profile</button></div><div class="card span4"><h2>Agent memory</h2><p class="muted">This becomes the evidence base for matching, CV tailoring and opportunity research.</p><div class="notice">No invented qualifications: the agent should use only user facts or verifiable sources.</div></div></div>'}
-function saveProfile(){db.profile.name=pname.value;db.profile.title=ptitle.value;db.profile.location=ploc.value;db.profile.skills=pskills.value.split(/\n|,/).map(x=>x.trim()).filter(Boolean);db.profile.languages=plangs.value.split(/\n|,/).map(x=>x.trim()).filter(Boolean);save();alert('Profile saved');renderProfile()}
-function match(text){let t=text.toLowerCase(),hits=db.profile.skills.filter(s=>t.includes(s.toLowerCase()));return {score:Math.min(100,Math.round(hits.length/Math.max(1,Math.min(db.profile.skills.length,8))*100)),hits}}
-function renderJobs(){jobs.innerHTML='<div class="grid"><div class="card span4"><h2>Add vacancy</h2><div class="field"><label>Job title</label><input id="jtitle" placeholder="Procurement Assistant"></div><div class="field"><label>Organization</label><input id="jorg" placeholder="Organization"></div><div class="field"><label>Country / city</label><input id="jloc" placeholder="Germany / Berlin"></div><div class="field"><label>Requirements / vacancy text</label><textarea id="jtext"></textarea></div><div class="field"><label>Source URL</label><input id="jurl" placeholder="https://..."></div><button class="btn" onclick="addJob()">Save & match</button></div><div class="card span8"><h2>Saved jobs</h2><div class="list">'+(db.jobs.length?db.jobs.map((j,i)=>'<div class="item"><h3>'+esc(j.title)+' — '+esc(j.org)+'</h3><p class="muted small">'+esc(j.loc)+' · Match '+j.score+'%</p><div class="score"><i style="width:'+j.score+'%"></i></div><p class="small">'+esc(j.hits.join(', ')||'No direct skill matches yet')+'</p><div class="actions"><button class="btn secondary" onclick="makeApplication('+i+')">Create application</button><button class="btn danger" onclick="delJob('+i+')">Delete</button></div></div>').join(''):'<div class="muted">No jobs yet.</div>')+'</div></div></div>'}
-function addJob(){let m=match(jtext.value+' '+jtitle.value);db.jobs.unshift({title:jtitle.value.trim()||'Untitled vacancy',org:jorg.value.trim(),loc:jloc.value.trim(),text:jtext.value,url:jurl.value.trim(),score:m.score,hits:m.hits,created:new Date().toISOString()});save();renderJobs()}
-function delJob(i){db.jobs.splice(i,1);save();renderJobs()}function makeApplication(i){let j=db.jobs[i];db.applications.unshift({job:j.title,org:j.org,status:'Draft',date:new Date().toISOString().slice(0,10),notes:'Tailor CV and cover letter using verified profile evidence.'});save();nav('applications')}
-function renderApplications(){applications.innerHTML='<div class="grid"><div class="card span12"><h2>Pipeline</h2><div class="list">'+(db.applications.length?db.applications.map((a,i)=>'<div class="item"><h3>'+esc(a.job)+' — '+esc(a.org)+'</h3><p><span class="badge">'+esc(a.status)+'</span> <span class="muted small">'+esc(a.date)+'</span></p><p class="muted small">'+esc(a.notes)+'</p><select onchange="statusApp('+i+',this.value)"><option '+(a.status==='Draft'?'selected':'')+'>Draft</option><option '+(a.status==='Ready'?'selected':'')+'>Ready</option><option '+(a.status==='Submitted'?'selected':'')+'>Submitted</option><option '+(a.status==='Interview'?'selected':'')+'>Interview</option><option '+(a.status==='Closed'?'selected':'')+'>Closed</option></select></div>').join(''):'<div class="muted">No applications yet.</div>')+'</div></div></div>'}
-function statusApp(i,v){db.applications[i].status=v;save();renderApplications()}
-function renderBusiness(){business.innerHTML='<div class="grid"><div class="card span4"><h2>Opportunity generator</h2><p class="muted small">Turn resources and problems into testable ideas, not promises.</p><div class="field"><label>Input</label><textarea id="ideaInput" placeholder="Example: engineering + procurement + social media skills and limited capital"></textarea></div><button class="btn" onclick="generateIdeas()">Generate ideas</button></div><div class="card span8"><h2>Ideas & experiments</h2><div class="list">'+(db.ideas.length?db.ideas.map((x,i)=>'<div class="item"><h3>'+esc(x.name)+'</h3><p>'+esc(x.hypothesis)+'</p><p class="small"><span class="badge">Demand test</span><span class="badge">Cost: '+esc(x.cost)+'</span></p><p class="muted small">Next test: '+esc(x.test)+'</p><button class="btn secondary" onclick="removeIdea('+i+')">Remove</button></div>').join(''):'<div class="muted">No ideas yet.</div>')+'</div></div></div>'}
-function generateIdeas(){let input=ideaInput.value.trim()||db.profile.skills.join(', ');let ts=[['B2B sourcing micro-service','Help small contractors compare technical suppliers using procurement and engineering knowledge.','near-zero','Interview 5 contractors and offer one free supplier comparison.'],['Technical content lead generation','Create targeted engineering/procurement explainers that can attract qualified business inquiries.','near-zero','Publish 5 targeted posts and measure qualified inquiries.'],['BOQ review service','Offer a structured second-look service for BOQs, specifications and procurement lists.','near-zero','Review one sample BOQ and ask 5 potential clients whether the report is useful.']];ts.forEach(t=>db.ideas.unshift({name:t[0],hypothesis:t[1]+' Context: '+input,cost:t[2],test:t[3]}));save();renderBusiness()}
-function removeIdea(i){db.ideas.splice(i,1);save();renderBusiness()}
-function renderResearch(){research.innerHTML='<div class="grid"><div class="card span5"><h2>Research question</h2><div class="field"><label>Topic</label><input id="rq" placeholder="Engineering jobs and migration route"></div><div class="field"><label>What must be verified?</label><textarea id="rv" placeholder="Rules, qualifications, language, application route..."></textarea></div><button class="btn" onclick="addResearch()">Save research task</button></div><div class="card span7"><h2>Research queue</h2><div class="list">'+(db.research.length?db.research.map((r,i)=>'<div class="item"><h3>'+esc(r.q)+'</h3><p class="muted small">'+esc(r.v)+'</p><span class="badge">Needs sources</span> <button class="btn danger" onclick="delResearch('+i+')">Delete</button></div>').join(''):'<div class="muted">No research tasks.</div>')+'</div></div></div>'}
-function addResearch(){db.research.unshift({q:rq.value.trim(),v:rv.value.trim(),date:new Date().toISOString()});save();renderResearch()}function delResearch(i){db.research.splice(i,1);save();renderResearch()}
-function renderKnowledge(){knowledge.innerHTML='<div class="grid"><div class="card span5"><h2>Add knowledge</h2><div class="field"><label>Title</label><input id="kt"></div><div class="field"><label>Summary / notes</label><textarea id="kc"></textarea></div><div class="field"><label>Source</label><input id="ks" placeholder="URL or report reference"></div><button class="btn" onclick="addKnowledge()">Store</button></div><div class="card span7"><h2>Knowledge base</h2><div class="list">'+(db.knowledge.length?db.knowledge.map(k=>'<div class="item"><h3>'+esc(k.t)+'</h3><p>'+esc(k.c)+'</p><p class="small muted">'+esc(k.s)+'</p></div>').join(''):'<div class="muted">No knowledge entries yet.</div>')+'</div></div></div>'}
-function addKnowledge(){db.knowledge.unshift({t:kt.value,c:kc.value,s:ks.value});save();renderKnowledge()}
-function renderAgent(){agent.innerHTML='<div class="card chat"><div class="messages" id="msgs">'+db.messages.map(m=>'<div class="msg '+m.role+'">'+esc(m.text)+'</div>').join('')+'</div><div class="chatbar"><input id="chatInput" placeholder="Ask Maher AI..."><button class="btn" onclick="sendChat()">Send</button></div></div>'}
-function sendChat(){let q=chatInput.value.trim();if(!q)return;db.messages.push({role:'user',text:q});let l=q.toLowerCase(),a;if(/job|وظيف|عمل|career/.test(l))a='ابدأ من Jobs: أضف نص الشاغر كما هو وسأحسب تطابقا أوليا بناء على مهارات ملفك الحالي. التطابق ليس ضمانا للقبول.';else if(/money|income|دخل|مال|business|مشروع/.test(l))a='استخدم Opportunity Lab. سأحوّل الفكرة إلى فرضية ثم اختبار صغير منخفض التكلفة بدل افتراض النجاح.';else if(/cv|سيرة/.test(l))a='ملفك الحالي هو Master Profile. بعد إضافة الخبرات والتعليم والشهادات يمكن بناء نسخ مخصصة لكل شاغر.';else a='فهمت طلبك. الوضع المحلي لا يستخدم API مدفوعا؛ حاليا أستطيع تنظيم بياناتك والمطابقة والتخطيط. يمكن إضافة نموذج اختياري لاحقا.';db.messages.push({role:'agent',text:a});save();renderAgent();chatInput.value=''}
-nav('dashboard');
-
-/* MAHER AI autonomous backend layer */
-const MAHER_SUPABASE_URL="https://ajxtvvnqukxywanrcgsu.supabase.co";
-const MAHER_SUPABASE_KEY="sb_publishable_t-KX-hKNzjD6viWVp7V5VA_h0FBCVlU";
-let MAHER_SESSION=null, MAHER_TASKS=[], MAHER_PROFILE=null;
-
-function maherAuthUI(){
-  if(document.getElementById("maher-auth")) return;
-  const x=document.createElement("div");x.id="maher-auth";x.style="position:fixed;inset:0;background:#02060ddd;z-index:99;display:flex;align-items:center;justify-content:center;padding:20px";
-  x.innerHTML='<div style="max-width:420px;width:100%;background:#0d1b2d;border:1px solid #1d3550;border-radius:16px;padding:22px"><h2>Maher <span style="color:#62d5c7">AI</span></h2><p class="muted">سجل الدخول حتى يحفظ الوكيل مهامه وذاكرته على الخادم</p><input id="mai-email" placeholder="البريد الإلكتروني" style="width:100%;margin:7px 0;padding:11px;background:#081524;color:#fff;border:1px solid #1d3550;border-radius:9px"><input id="mai-pass" type="password" placeholder="كلمة المرور" style="width:100%;margin:7px 0;padding:11px;background:#081524;color:#fff;border:1px solid #1d3550;border-radius:9px"><div class="actions"><button class="btn" id="mai-login">دخول</button><button class="btn secondary" id="mai-signup">إنشاء حساب</button></div><p id="mai-msg" class="small muted"></p></div>';
-  document.body.appendChild(x);
-  const sbc=supabase.createClient(MAHER_SUPABASE_URL,MAHER_SUPABASE_KEY);
-  window.MAHER_SB=sbc;
-  document.getElementById("mai-login").onclick=async()=>{try{const {error}=await sbc.auth.signInWithPassword({email:document.getElementById("mai-email").value,password:document.getElementById("mai-pass").value});if(error)throw error;await maherBoot()}catch(e){document.getElementById("mai-msg").textContent=e.message}};
-  document.getElementById("mai-signup").onclick=async()=>{try{const {error}=await sbc.auth.signUp({email:document.getElementById("mai-email").value,password:document.getElementById("mai-pass").value});if(error)throw error;document.getElementById("mai-msg").textContent="تم إنشاء الحساب؛ إذا ظهر طلب تأكيد افتح بريدك ثم سجل الدخول."}catch(e){document.getElementById("mai-msg").textContent=e.message}};
+const SUPABASE_URL="https://ajxtvvnqukxywanrcgsu.supabase.co";
+const SUPABASE_KEY="sb_publishable_t-KX-hKNzjD6viWVp7V5VA_h0FBCVlU";
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let session=null,profile=null,tasks=[],messages=JSON.parse(localStorage.getItem("maher-ai-chat")||"[]");
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+function saveChat(){localStorage.setItem("maher-ai-chat",JSON.stringify(messages.slice(-100)))}
+function go(p){document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));document.getElementById(p).classList.remove("hidden");document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===p));({dashboard:renderDashboard,agent:renderAgent,tasks:renderTasks,profile:renderProfile,jobs:renderJobs,research:renderResearch,business:renderBusiness}[p])()}
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.page));
+async function call(path,opt={}){if(!session)throw Error("سجل الدخول أولا");const r=await fetch(SUPABASE_URL+"/functions/v1/maher-ai-agent/"+path,{...opt,headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});const j=await r.json();if(!r.ok)throw Error(j.error||"خطأ في الخادم");return j}
+async function login(){
+ const email=prompt("البريد الإلكتروني"); if(!email)return;
+ const password=prompt("كلمة المرور"); if(!password)return;
+ const {data,error}=await sb.auth.signInWithPassword({email,password});
+ if(error){if(confirm("لا يوجد دخول صالح. هل تريد إنشاء حساب؟")){const x=await sb.auth.signUp({email,password});if(x.error)alert(x.error.message);else alert("تم إنشاء الحساب. إذا طلب تأكيد البريد افتحه ثم سجل الدخول.");}else alert(error.message);return}
+ session=data.session;await boot()
 }
-async function maherCall(path,options={}){
-  const {data:{session}}=await MAHER_SB.auth.getSession();if(!session)throw Error("يرجى تسجيل الدخول");
-  const r=await fetch(MAHER_SUPABASE_URL+"/functions/v1/maher-ai-agent/"+path,{...options,headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});
-  const j=await r.json();if(!r.ok)throw Error(j.error||"Backend error");return j;
+async function boot(){
+ if(!session)return;
+ connection.textContent="Agent online";
+ try{profile=(await call("profile")).data;tasks=(await call("tasks")).data||[]}catch(e){connection.textContent="Backend error";return}
+ renderDashboard()
 }
-async function maherBoot(){
-  const {data:{session}}=await MAHER_SB.auth.getSession();
-  if(!session){maherAuthUI();return}
-  MAHER_SESSION=session;const a=document.getElementById("maher-auth");if(a)a.style.display="none";
-  try{MAHER_PROFILE=(await maherCall("profile")).data;MAHER_TASKS=(await maherCall("tasks")).data||[]}catch(e){}
-  const old=document.querySelector(".pill");if(old)old.textContent="Agent online";
-  render("dashboard");
-}
-function addAgentControls(){
-  if(document.querySelector('[data-page="wallet"]'))return;
-  const n=document.getElementById("nav");if(n){const b=document.createElement("button");b.dataset.page="wallet";b.textContent="Wallet / Receive Only";b.onclick=()=>nav("wallet");n.appendChild(b)}
-  const sec=document.querySelector(".side .notice");if(sec)sec.innerHTML="<b>Autonomous mode</b><br>Planning • research • experiments • service creation<br><br><b>Financial lock</b><br>Receive only • no withdrawals • no transfers • no trading";
-  const sec2=document.createElement("section");sec2.id="wallet";sec2.className="page hidden";document.querySelector(".main").insertBefore(sec2,document.querySelector(".footer"));
-}
-async function agentTask(q){
-  const created=await maherCall("tasks",{method:"POST",body:JSON.stringify({instruction:q})});
-  const run=await maherCall("tasks/"+created.data.id+"/run",{method:"POST",body:"{}"});
-  MAHER_TASKS.unshift(run.data);
-  return run.data;
+function renderDashboard(){
+ dashboard.innerHTML='<div class="grid">'+
+ '<div class="card s3"><div class="muted small">المهام</div><div class="metric">'+tasks.length+'</div></div>'+
+ '<div class="card s3"><div class="muted small">مستوى الاستقلالية</div><div class="metric">'+(profile?.autonomy_level??80)+'%</div></div>'+
+ '<div class="card s3"><div class="muted small">النماذج</div><div class="metric">3+</div></div>'+
+ '<div class="card s3"><div class="muted small">الوضع</div><div class="metric">Cloud</div></div>'+
+ '<div class="card s8"><h2>أعطه الهدف فقط</h2><p class="muted">الوكيل يخطط للمهمة ويختار الأدوات والنموذج المناسب عندما تكون مزودة ومهيأة على الخادم.</p><div class="actions"><button class="btn" onclick="go(\'agent\')">ابدأ مهمة</button><button class="btn secondary" onclick="go(\'tasks\')">شاهد المهام</button></div></div>'+
+ '<div class="card s4"><h2>قواعد التشغيل</h2><p><span class="badge">ذاكرة</span><span class="badge">تخطيط</span><span class="badge">إعادة محاولة</span><span class="badge">Multi-model</span></p><p class="small muted">لا اختلاق للبيانات. لا تجاوز للتحقق. لا معاملات مالية.</p></div>'+
+ '</div>'
 }
 function renderAgent(){
-  agent.innerHTML='<div class="card chat"><div class="messages" id="msgs">'+db.messages.map(m=>'<div class="msg '+m.role+'">'+esc(m.text)+'</div>').join('')+'</div><div class="chatbar"><input id="chatInput" placeholder="اعطني الهدف وليس الخطوات... مثال: ابتكر خدمة اقدر ابيعها بخبرتي"><button class="btn" onclick="sendChat()">Run</button></div></div>';
+ if(!messages.length)messages=[{role:"agent",text:"أنا Maher AI. أعطني الهدف، وسأحوّله إلى خطة تنفيذ وأحفظ المهمة على الخادم."}];
+ agent.innerHTML='<div class="card chat"><div class="messages" id="msgs">'+messages.map(m=>'<div class="msg '+m.role+'">'+esc(m.text)+'</div>').join("")+'</div><div class="chatbar"><input id="q" placeholder="مثال: ابحث عن أفضل فرص عمل مناسبة لخبرتي في أوروبا"><button class="btn" onclick="runTask()">تنفيذ</button></div><div id="agentStatus" class="status"></div></div>'
 }
-async function sendChat(){
-  const q=chatInput.value.trim();if(!q)return;
-  db.messages.push({role:"user",text:q});save();renderAgent();
-  try{
-    const task=await agentTask(q);
-    const r=task.result||{};
-    let out="نفذت المهمة على محرك الوكيل.\n\nنوع المهمة: "+(r.type||"general")+"\n";
-    if(r.plan?.steps)out+="\nخطة التنفيذ:\n"+r.plan.steps.map((x,i)=>(i+1)+". "+x).join("\n");
-    if(r.actions?.[0]?.ideas)out+="\n\nأفكار قابلة للاختبار:\n"+r.actions[0].ideas.map(x=>"• "+x.name+" — "+x.offer+"\n  الاختبار: "+x.test).join("\n");
-    if(r.llm)out+="\n\nالتحليل الإبداعي:\n"+r.llm;
-    out+="\n\nالقاعدة المالية: استقبال فقط؛ لا سحب ولا تحويل ولا تداول.";
-    db.messages.push({role:"agent",text:out});save();renderAgent();
-    if(document.getElementById("tasks"))render("tasks");
-  }catch(e){db.messages.push({role:"agent",text:"تعذر تنفيذ المهمة: "+e.message});save();renderAgent()}
+async function runTask(){
+ const input=document.getElementById("q"),q=input.value.trim();if(!q)return;
+ messages.push({role:"user",text:q});saveChat();renderAgent();document.getElementById("agentStatus").textContent="الوكيل يخطط وينفذ...";
+ try{
+   const created=await call("tasks",{method:"POST",body:JSON.stringify({instruction:q})});
+   const result=await call("tasks/"+created.data.id+"/run",{method:"POST",body:"{}"});
+   tasks.unshift(result.data);
+   const r=result.data.result||{};
+   let text="اكتملت دورة الوكيل.\n\nالنوع: "+(r.type||"general");
+   if(r.plan?.steps)text+="\n\nالخطة:\n"+r.plan.steps.map((x,i)=>(i+1)+". "+x).join("\n");
+   if(r.actions?.length)text+="\n\nالإجراء:\n"+JSON.stringify(r.actions,null,2);
+   if(r.llm)text+="\n\nتحليل النموذج:\n"+r.llm;
+   messages.push({role:"agent",text});saveChat();renderAgent()
+ }catch(e){messages.push({role:"agent",text:"تعذر التنفيذ: "+e.message});saveChat();renderAgent()}
 }
 function renderTasks(){
-  tasks.innerHTML='<div class="card span12"><h2>Autonomous Tasks</h2><p class="muted">المهام التي أنشأها الوكيل وخططها ونتائجها.</p><div class="list">'+(MAHER_TASKS.length?MAHER_TASKS.map(t=>'<div class="item"><h3>'+esc(t.title)+'</h3><p class="small muted">'+esc(t.task_type)+' · '+esc(t.status)+'</p><p>'+esc(t.instruction)+'</p><button class="btn secondary" onclick="rerunTask(\''+t.id+'\')">Run again</button></div>').join(''):'<div class="muted">لا توجد مهام محفوظة بعد.</div>')+'</div></div>';
+ tasks=document.getElementById("tasks")?tasks:tasks;
+ document.getElementById("tasks").innerHTML='<div class="grid"><div class="card s12"><h2>المهام المستقلة</h2><div class="list">'+(window.taskList?.length?window.taskList.map(t=>"<div></div>").join(""):"")+'</div></div></div>';
+ // render from current array
+ document.getElementById("tasks").innerHTML='<div class="card"><h2>المهام المستقلة</h2><div class="list">'+(tasks.length?tasks.map(t=>'<div class="item"><h3>'+esc(t.title)+'</h3><p class="small muted">'+esc(t.task_type)+' · '+esc(t.status)+'</p><p>'+esc(t.instruction)+'</p><button class="btn secondary" onclick="rerun(\''+t.id+'\')">إعادة التنفيذ</button></div>').join(""):'<div class="muted">لا توجد مهام.</div>')+'</div></div>'
 }
-async function rerunTask(id){try{const r=await maherCall("tasks/"+id+"/run",{method:"POST",body:"{}"});MAHER_TASKS.unshift(r.data);renderTasks()}catch(e){alert(e.message)}}
-function renderWallet(){
-  wallet.innerHTML='<div class="grid"><div class="card span7"><h2>Receive Wallet</h2><p class="muted">يسجل الوكيل عنوان الاستلام فقط. لا نضع مفتاحًا خاصًا داخل التطبيق.</p><div class="field"><label>Receive address</label><input id="waddr" placeholder="ضع عنوان الاستلام هنا"></div><div class="field"><label>Network</label><input id="wnet" placeholder="الشبكة"></div><div class="field"><label>Asset</label><input id="wasset" placeholder="الأصل"></div><div class="field"><label><input id="wen" type="checkbox"> تفعيل الاستقبال</label></div><button class="btn" onclick="saveWallet()">Save receive settings</button></div><div class="card span5"><h2>Financial Lock</h2><p><span class="badge">RECEIVE ONLY</span></p><p>Withdrawals: <b>BLOCKED</b></p><p>Transfers: <b>BLOCKED</b></p><p>Trading: <b>BLOCKED</b></p><p class="small muted">التحويل يكون مباشرة إلى عنوان الاستلام الذي تسجله أنت؛ الوكيل لا يملك مفاتيح أو صلاحية سحب.</p></div></div>';
-  loadWallet();
+async function rerun(id){try{const r=await call("tasks/"+id+"/run",{method:"POST",body:"{}"});tasks.unshift(r.data);renderTasks()}catch(e){alert(e.message)}}
+function renderProfile(){
+ const p=profile||{};document.getElementById("profile").innerHTML='<div class="card"><h2>الملف الأساسي</h2><div class="field"><label>الاسم</label><input id="pn" value="'+esc(p.name)+'"></div><div class="field"><label>العنوان المهني</label><input id="ph" value="'+esc(p.headline)+'"></div><div class="field"><label>الموقع</label><input id="pl" value="'+esc(p.location)+'"></div><div class="field"><label>المهارات — كل مهارة في سطر</label><textarea id="ps">'+esc((p.skills||[]).join("\n"))+'</textarea></div><button class="btn" onclick="saveProfile()">حفظ</button></div>'
 }
-async function loadWallet(){try{const r=await maherCall("wallet");if(r.data){waddr.value=r.data.receive_address||"";wnet.value=r.data.network||"";wasset.value=r.data.asset||"";wen.checked=!!r.data.enabled}}catch(e){}}
-async function saveWallet(){try{await maherCall("wallet",{method:"POST",body:JSON.stringify({receive_address:waddr.value,network:wnet.value,asset:wasset.value,enabled:wen.checked})});alert("تم حفظ إعدادات الاستلام فقط")}catch(e){alert(e.message)}}
-const oldRender=render;render=function(p){if(p==="tasks")return renderTasks();if(p==="wallet")return renderWallet();return oldRender(p)};
-addAgentControls();maherAuthUI();maherBoot();
-</script></body></html>
+async function saveProfile(){try{const r=await call("profile",{method:"POST",body:JSON.stringify({name:pn.value,headline:ph.value,location:pl.value,skills:ps.value.split(/\n|,/).map(x=>x.trim()).filter(Boolean),languages:profile?.languages||[],goals:profile?.goals||[],autonomy_level:profile?.autonomy_level??80})});profile=r.data;alert("تم الحفظ")}catch(e){alert(e.message)}}
+function renderJobs(){document.getElementById("jobs").innerHTML='<div class="grid"><div class="card s5"><h2>أضف شاغرًا</h2><div class="field"><label>العنوان</label><input id="jt"></div><div class="field"><label>الجهة</label><input id="jo"></div><div class="field"><label>نص الإعلان</label><textarea id="jx"></textarea></div><button class="btn" onclick="addJob()">حفظ</button></div><div class="card s7"><h2>ملاحظة</h2><p class="muted">النسخة الحالية تسجل الشواغر يدويًا. الخطوة التالية هي إضافة موصلات بحث عامة ومسموح بها للوظائف.</p></div></div>'}
+function renderResearch(){document.getElementById("research").innerHTML='<div class="card"><h2>البحث</h2><p class="muted">أعط الوكيل سؤال البحث من صفحة الوكيل. سيحفظ المهمة والنتيجة.</p></div>'}
+function renderBusiness(){document.getElementById("business").innerHTML='<div class="card"><h2>الخدمات والأعمال</h2><p class="muted">اطلب من الوكيل ابتكار خدمة، اختبار الطلب عليها، إعداد العرض، وبناء خطة الوصول للعملاء.</p></div>'}
+async function addJob(){try{await call("jobs",{method:"POST",body:JSON.stringify({title:jt.value,organization:jo.value,description:jx.value})});alert("تم الحفظ")}catch(e){alert(e.message)}}
+(async()=>{const {data}=await sb.auth.getSession();session=data.session;if(session)await boot();else{connection.textContent="سجل الدخول";go("dashboard");if(confirm("تسجيل الدخول إلى Maher AI؟"))login()}})();
+</script>
+</body></html>
