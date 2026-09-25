@@ -52,28 +52,37 @@ function go(p){document.querySelectorAll(".page").forEach(x=>x.classList.add("hi
 document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.page));
 async function call(path,opt={}){if(!session)throw Error("سجل الدخول أولا");const r=await fetch(SUPABASE_URL+"/functions/v1/maher-ai-agent/"+path,{...opt,headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});const j=await r.json();if(!r.ok)throw Error(j.error||"خطأ في الخادم");return j}
 const OWNER_EMAIL="mahersaleem78@gmail.com";
+let otpSent=false;
 async function login(){
- const email=prompt("أدخل البريد الإلكتروني");
- if(!email)return;
- if(email.trim().toLowerCase()!==OWNER_EMAIL){
-   alert("هذا التطبيق خاص بحساب Maher AI فقط.");
-   return;
- }
- const {error}=await sb.auth.signInWithOtp({
-   email:OWNER_EMAIL,
-   options:{shouldCreateUser:false}
- });
- if(error){alert("تعذر إرسال رمز التحقق: "+error.message);return}
- const token=prompt("تم إرسال رمز التحقق إلى بريدك الإلكتروني. أدخل الرمز المكون من 6 أرقام");
- if(!token)return;
- const {data:verified,error:verifyError}=await sb.auth.verifyOtp({
-   email:OWNER_EMAIL,
-   token:token.trim(),
-   type:"email"
- });
- if(verifyError){alert("رمز التحقق غير صحيح أو منتهي الصلاحية: "+verifyError.message);return}
- session=verified.session;
- await boot();
+  if(session){await boot();return}
+  dashboard.innerHTML='<div class="card" style="max-width:560px;margin:70px auto;text-align:center"><h2>تسجيل الدخول إلى Maher AI</h2><p class="muted">هذا الوكيل خاص بحساب المالك الوحيد.</p><div class="field" style="text-align:right"><label>البريد الإلكتروني المسموح</label><input value="'+OWNER_EMAIL+'" readonly></div><button id="sendOtpBtn" class="btn" onclick="sendOtp()">إرسال رمز التحقق</button><div id="otpBox" class="hidden"><div class="field" style="text-align:right"><label>رمز التحقق</label><input id="otpInput" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" style="font-size:24px;letter-spacing:8px;text-align:center"></div><button class="btn" onclick="verifyOwnerOtp()">دخول</button><button class="btn secondary" onclick="sendOtp()">إرسال رمز جديد</button></div><div id="loginStatus" class="status"></div></div>';
+}
+async function sendOtp(){
+  const status=document.getElementById("loginStatus"),box=document.getElementById("otpBox"),btn=document.getElementById("sendOtpBtn");
+  if(btn)btn.disabled=true;
+  if(status)status.textContent="جار إرسال رمز التحقق إلى "+OWNER_EMAIL+"...";
+  const {error}=await sb.auth.signInWithOtp({email:OWNER_EMAIL,options:{shouldCreateUser:false}});
+  if(error){
+    if(status)status.textContent="تعذر إرسال رمز التحقق: "+error.message;
+    if(btn)btn.disabled=false;
+    return;
+  }
+  otpSent=true;
+  if(box)box.classList.remove("hidden");
+  if(status)status.textContent="تم إرسال الرمز. أدخل الرمز المكون من 6 أرقام.";
+  const input=document.getElementById("otpInput"); if(input)input.focus();
+  if(btn)btn.textContent="تم الإرسال";
+  if(btn)btn.disabled=false;
+}
+async function verifyOwnerOtp(){
+  const token=(document.getElementById("otpInput")?.value||"").replace(/\\D/g,"");
+  const status=document.getElementById("loginStatus");
+  if(!otpSent||token.length!==6){if(status)status.textContent="أدخل رمزًا مكونًا من 6 أرقام.";return}
+  if(status)status.textContent="جار التحقق...";
+  const {data:verified,error:verifyError}=await sb.auth.verifyOtp({email:OWNER_EMAIL,token,type:"email"});
+  if(verifyError){if(status)status.textContent="رمز التحقق غير صحيح أو منتهي الصلاحية: "+verifyError.message;return}
+  session=verified.session;
+  await boot();
 }
 async function boot(){
  if(!session)return;
