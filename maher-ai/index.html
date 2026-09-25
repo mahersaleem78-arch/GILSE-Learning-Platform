@@ -51,12 +51,29 @@ function saveChat(){localStorage.setItem("maher-ai-chat",JSON.stringify(messages
 function go(p){document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));document.getElementById(p).classList.remove("hidden");document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===p));({dashboard:renderDashboard,agent:renderAgent,tasks:renderTasks,profile:renderProfile,jobs:renderJobs,research:renderResearch,business:renderBusiness,goals:renderGoals}[p])()}
 document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.page));
 async function call(path,opt={}){if(!session)throw Error("سجل الدخول أولا");const r=await fetch(SUPABASE_URL+"/functions/v1/maher-ai-agent/"+path,{...opt,headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});const j=await r.json();if(!r.ok)throw Error(j.error||"خطأ في الخادم");return j}
+const OWNER_EMAIL="mahersaleem78@gmail.com";
 async function login(){
- const email=prompt("البريد الإلكتروني"); if(!email)return;
- const password=prompt("كلمة المرور"); if(!password)return;
- const {data,error}=await sb.auth.signInWithPassword({email,password});
- if(error){if(confirm("لا يوجد دخول صالح. هل تريد إنشاء حساب؟")){const x=await sb.auth.signUp({email,password});if(x.error)alert(x.error.message);else alert("تم إنشاء الحساب. إذا طلب تأكيد البريد افتحه ثم سجل الدخول.");}else alert(error.message);return}
- session=data.session;await boot()
+ const email=prompt("أدخل البريد الإلكتروني");
+ if(!email)return;
+ if(email.trim().toLowerCase()!==OWNER_EMAIL){
+   alert("هذا التطبيق خاص بحساب Maher AI فقط.");
+   return;
+ }
+ const {error}=await sb.auth.signInWithOtp({
+   email:OWNER_EMAIL,
+   options:{shouldCreateUser:false}
+ });
+ if(error){alert("تعذر إرسال رمز التحقق: "+error.message);return}
+ const token=prompt("تم إرسال رمز التحقق إلى بريدك الإلكتروني. أدخل الرمز المكون من 6 أرقام");
+ if(!token)return;
+ const {data:verified,error:verifyError}=await sb.auth.verifyOtp({
+   email:OWNER_EMAIL,
+   token:token.trim(),
+   type:"email"
+ });
+ if(verifyError){alert("رمز التحقق غير صحيح أو منتهي الصلاحية: "+verifyError.message);return}
+ session=verified.session;
+ await boot();
 }
 async function boot(){
  if(!session)return;
@@ -114,6 +131,6 @@ function renderJobs(){document.getElementById("jobs").innerHTML='<div class="gri
 function renderResearch(){document.getElementById("research").innerHTML='<div class="card"><h2>البحث</h2><p class="muted">أعط الوكيل سؤال البحث من صفحة الوكيل. سيحفظ المهمة والنتيجة.</p></div>'}
 function renderBusiness(){document.getElementById("business").innerHTML='<div class="card"><h2>الخدمات والأعمال</h2><p class="muted">اطلب من الوكيل ابتكار خدمة، اختبار الطلب عليها، إعداد العرض، وبناء خطة الوصول للعملاء.</p></div>'}
 async function addJob(){try{await call("jobs",{method:"POST",body:JSON.stringify({title:jt.value,organization:jo.value,description:jx.value})});alert("تم الحفظ")}catch(e){alert(e.message)}}
-(async()=>{const {data}=await sb.auth.getSession();session=data.session;if(session)await boot();else{connection.textContent="سجل الدخول";go("dashboard");if(confirm("تسجيل الدخول إلى Maher AI؟"))login()}})();
+(async()=>{const {data}=await sb.auth.getSession();session=data.session;if(session)await boot();else{connection.textContent="سجل الدخول";go("dashboard");login()}})();
 </script>
 </body></html>
