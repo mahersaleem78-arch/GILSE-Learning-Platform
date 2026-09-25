@@ -47,6 +47,7 @@ const SUPABASE_KEY="sb_publishable_t-KX-hKNzjD6viWVp7V5VA_h0FBCVlU";
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let session=null,profile=null,tasks=[],goals=[],memories=[],messages=JSON.parse(localStorage.getItem("maher-ai-chat")||"[]");
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+function normalizeOtp(v){return String(v??"").replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d))).replace(/[^0-9]/g,"").slice(0,6)}
 function saveChat(){localStorage.setItem("maher-ai-chat",JSON.stringify(messages.slice(-100)))}
 function go(p){document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));document.getElementById(p).classList.remove("hidden");document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===p));({dashboard:renderDashboard,agent:renderAgent,tasks:renderTasks,profile:renderProfile,jobs:renderJobs,research:renderResearch,business:renderBusiness,goals:renderGoals}[p])()}
 document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.page));
@@ -75,7 +76,7 @@ async function sendOtp(){
   if(btn)btn.disabled=false;
 }
 async function verifyOwnerOtp(){
-  const token=(document.getElementById("otpInput")?.value||"").replace(/\\D/g,"");
+  const token=normalizeOtp(document.getElementById("otpInput")?.value||"");
   const status=document.getElementById("loginStatus");
   if(!otpSent||token.length!==6){if(status)status.textContent="أدخل رمزًا مكونًا من 6 أرقام.";return}
   if(status)status.textContent="جار التحقق...";
@@ -86,9 +87,16 @@ async function verifyOwnerOtp(){
 }
 async function boot(){
  if(!session)return;
- connection.textContent="Agent online";
- try{profile=(await call("profile")).data;tasks=(await call("tasks")).data||[];goals=(await call("goals")).data||[];memories=(await call("memory")).data||[]}catch(e){connection.textContent="Backend error";return}
- renderDashboard()
+ connection.textContent="فحص الاتصال...";
+ try{
+   const h=await call("health");
+   if(!h?.ok)throw Error("الخادم لم يؤكد جاهزيته");
+   const results=await Promise.allSettled([call("profile"),call("tasks"),call("goals"),call("memory")]);
+   const names=["profile","tasks","goals","memory"],failed=[];
+   results.forEach((r,i)=>{if(r.status==="fulfilled"){if(i===0)profile=r.value.data;if(i===1)tasks=r.value.data||[];if(i===2)goals=r.value.data||[];if(i===3)memories=r.value.data||[]}else failed.push(names[i]+": "+(r.reason?.message||"unknown error"))});
+   if(failed.length){connection.textContent="Backend error";dashboard.innerHTML='<div class="card" style="border-color:var(--danger)"><h2>خطأ في الاتصال بالخادم</h2><p class="muted">'+esc(failed.join(" • "))+'</p><button class="btn" onclick="boot()">إعادة المحاولة</button></div>';return}
+   connection.textContent="Agent online"; renderDashboard();
+ }catch(e){connection.textContent="Backend error";dashboard.innerHTML='<div class="card" style="border-color:var(--danger)"><h2>تعذر تشغيل الوكيل</h2><p class="muted">'+esc(e.message||"خطأ غير معروف")+'</p><button class="btn" onclick="boot()">إعادة المحاولة</button></div>'}
 }
 function renderDashboard(){
  dashboard.innerHTML='<div class="grid">'+
@@ -140,6 +148,7 @@ function renderJobs(){document.getElementById("jobs").innerHTML='<div class="gri
 function renderResearch(){document.getElementById("research").innerHTML='<div class="card"><h2>البحث</h2><p class="muted">أعط الوكيل سؤال البحث من صفحة الوكيل. سيحفظ المهمة والنتيجة.</p></div>'}
 function renderBusiness(){document.getElementById("business").innerHTML='<div class="card"><h2>الخدمات والأعمال</h2><p class="muted">اطلب من الوكيل ابتكار خدمة، اختبار الطلب عليها، إعداد العرض، وبناء خطة الوصول للعملاء.</p></div>'}
 async function addJob(){try{await call("jobs",{method:"POST",body:JSON.stringify({title:jt.value,organization:jo.value,description:jx.value})});alert("تم الحفظ")}catch(e){alert(e.message)}}
+sb.auth.onAuthStateChange((event,s)=>{session=s;if(s){boot()}else{connection.textContent="سجل الدخول";login()}});
 (async()=>{const {data}=await sb.auth.getSession();session=data.session;if(session)await boot();else{connection.textContent="سجل الدخول";go("dashboard");login()}})();
 </script>
 </body></html>
