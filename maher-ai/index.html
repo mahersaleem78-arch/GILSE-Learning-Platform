@@ -61,7 +61,7 @@ async function login(){
  }
  const {error}=await sb.auth.signInWithOtp({
    email:OWNER_EMAIL,
-   options:{shouldCreateUser:true}
+   options:{shouldCreateUser:false}
  });
  if(error){alert("تعذر إرسال رمز التحقق: "+error.message);return}
  const token=prompt("تم إرسال رمز التحقق إلى بريدك الإلكتروني. أدخل الرمز المكون من 6 أرقام");
