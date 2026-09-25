@@ -24,6 +24,7 @@
 <button data-page="jobs">الوظائف</button>
 <button data-page="research">البحث</button>
 <button data-page="business">الخدمات والأعمال</button>
+<button data-page="goals">الأهداف والذاكرة</button>
 </div>
 <div class="notice small">العقل الأساسي سحابي. يمكن إضافة مزودي GPT وClaude وGemini من الخادم دون كشف مفاتيحهم للمتصفح.</div>
 </aside>
@@ -36,6 +37,7 @@
 <section id="jobs" class="page hidden"></section>
 <section id="research" class="page hidden"></section>
 <section id="business" class="page hidden"></section>
+<section id="goals" class="page hidden"></section>
 <div class="footer">Maher AI • Cloud-first • Multi-model ready • لا معاملات مالية داخل الوكيل</div>
 </main></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -43,10 +45,10 @@
 const SUPABASE_URL="https://ajxtvvnqukxywanrcgsu.supabase.co";
 const SUPABASE_KEY="sb_publishable_t-KX-hKNzjD6viWVp7V5VA_h0FBCVlU";
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let session=null,profile=null,tasks=[],messages=JSON.parse(localStorage.getItem("maher-ai-chat")||"[]");
+let session=null,profile=null,tasks=[],goals=[],memories=[],messages=JSON.parse(localStorage.getItem("maher-ai-chat")||"[]");
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
 function saveChat(){localStorage.setItem("maher-ai-chat",JSON.stringify(messages.slice(-100)))}
-function go(p){document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));document.getElementById(p).classList.remove("hidden");document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===p));({dashboard:renderDashboard,agent:renderAgent,tasks:renderTasks,profile:renderProfile,jobs:renderJobs,research:renderResearch,business:renderBusiness}[p])()}
+function go(p){document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));document.getElementById(p).classList.remove("hidden");document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===p));({dashboard:renderDashboard,agent:renderAgent,tasks:renderTasks,profile:renderProfile,jobs:renderJobs,research:renderResearch,business:renderBusiness,goals:renderGoals}[p])()}
 document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.page));
 async function call(path,opt={}){if(!session)throw Error("سجل الدخول أولا");const r=await fetch(SUPABASE_URL+"/functions/v1/maher-ai-agent/"+path,{...opt,headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token}});const j=await r.json();if(!r.ok)throw Error(j.error||"خطأ في الخادم");return j}
 async function login(){
@@ -59,14 +61,14 @@ async function login(){
 async function boot(){
  if(!session)return;
  connection.textContent="Agent online";
- try{profile=(await call("profile")).data;tasks=(await call("tasks")).data||[]}catch(e){connection.textContent="Backend error";return}
+ try{profile=(await call("profile")).data;tasks=(await call("tasks")).data||[];goals=(await call("goals")).data||[];memories=(await call("memory")).data||[]}catch(e){connection.textContent="Backend error";return}
  renderDashboard()
 }
 function renderDashboard(){
  dashboard.innerHTML='<div class="grid">'+
  '<div class="card s3"><div class="muted small">المهام</div><div class="metric">'+tasks.length+'</div></div>'+
  '<div class="card s3"><div class="muted small">مستوى الاستقلالية</div><div class="metric">'+(profile?.autonomy_level??80)+'%</div></div>'+
- '<div class="card s3"><div class="muted small">النماذج</div><div class="metric">3+</div></div>'+
+ '<div class="card s3"><div class="muted small">النماذج</div><div class="metric">4</div></div>'+
  '<div class="card s3"><div class="muted small">الوضع</div><div class="metric">Cloud</div></div>'+
  '<div class="card s8"><h2>أعطه الهدف فقط</h2><p class="muted">الوكيل يخطط للمهمة ويختار الأدوات والنموذج المناسب عندما تكون مزودة ومهيأة على الخادم.</p><div class="actions"><button class="btn" onclick="go(\'agent\')">ابدأ مهمة</button><button class="btn secondary" onclick="go(\'tasks\')">شاهد المهام</button></div></div>'+
  '<div class="card s4"><h2>قواعد التشغيل</h2><p><span class="badge">ذاكرة</span><span class="badge">تخطيط</span><span class="badge">إعادة محاولة</span><span class="badge">Multi-model</span></p><p class="small muted">لا اختلاق للبيانات. لا تجاوز للتحقق. لا معاملات مالية.</p></div>'+
@@ -102,6 +104,12 @@ function renderProfile(){
  const p=profile||{};document.getElementById("profile").innerHTML='<div class="card"><h2>الملف الأساسي</h2><div class="field"><label>الاسم</label><input id="pn" value="'+esc(p.name)+'"></div><div class="field"><label>العنوان المهني</label><input id="ph" value="'+esc(p.headline)+'"></div><div class="field"><label>الموقع</label><input id="pl" value="'+esc(p.location)+'"></div><div class="field"><label>المهارات — كل مهارة في سطر</label><textarea id="ps">'+esc((p.skills||[]).join("\n"))+'</textarea></div><button class="btn" onclick="saveProfile()">حفظ</button></div>'
 }
 async function saveProfile(){try{const r=await call("profile",{method:"POST",body:JSON.stringify({name:pn.value,headline:ph.value,location:pl.value,skills:ps.value.split(/\n|,/).map(x=>x.trim()).filter(Boolean),languages:profile?.languages||[],goals:profile?.goals||[],autonomy_level:profile?.autonomy_level??80})});profile=r.data;alert("تم الحفظ")}catch(e){alert(e.message)}}
+function renderGoals(){
+ document.getElementById("goals").innerHTML='<div class="grid"><div class="card s6"><h2>الأهداف النشطة</h2><div class="list">'+(goals.length?goals.map(g=>'<div class="item"><h3>'+esc(g.title)+'</h3><p>'+esc(g.description)+'</p><span class="badge">أولوية '+g.priority+'</span><span class="badge">تقدم '+g.progress+'%</span></div>').join(""):'<div class="muted">لا توجد أهداف بعد</div>')+'</div><div class="field"><label>هدف جديد</label><input id="goalTitle" placeholder="مثال: الحصول على 5 فرص عمل مناسبة"></div><div class="field"><label>الوصف</label><textarea id="goalDesc" placeholder="ما النتيجة التي تريد من الوكيل الوصول إليها؟"></textarea></div><button class="btn" onclick="addGoal()">إضافة هدف</button> <button class="btn secondary" onclick="nextAction()">ما الخطوة التالية؟</button></div><div class="card s6"><h2>الذاكرة طويلة الأمد</h2><div class="list">'+(memories.length?memories.slice(0,30).map(m=>'<div class="item"><p>'+esc(m.content)+'</p><span class="badge">'+esc(m.memory_type)+'</span><span class="badge">أهمية '+m.importance+'</span></div>').join(""):'<div class="muted">لا توجد ذاكرة بعد</div>')+'</div><div class="field"><label>أضف معلومة مهمة للوكيل</label><textarea id="memContent" placeholder="معلومة تريد من الوكيل تذكرها"></textarea></div><button class="btn" onclick="addMemory()">حفظ في الذاكرة</button></div></div>'
+}
+async function addGoal(){try{const r=await call("goals",{method:"POST",body:JSON.stringify({title:goalTitle.value,description:goalDesc.value,priority:80})});goals.unshift(r.data);renderGoals()}catch(e){alert(e.message)}}
+async function addMemory(){try{const r=await call("memory",{method:"POST",body:JSON.stringify({content:memContent.value,importance:70})});memories.unshift(r.data);renderGoals()}catch(e){alert(e.message)}}
+async function nextAction(){try{const r=await call("next");alert(r.data.advice||"لا توجد توصية")}catch(e){alert(e.message)}}
 function renderJobs(){document.getElementById("jobs").innerHTML='<div class="grid"><div class="card s5"><h2>أضف شاغرًا</h2><div class="field"><label>العنوان</label><input id="jt"></div><div class="field"><label>الجهة</label><input id="jo"></div><div class="field"><label>نص الإعلان</label><textarea id="jx"></textarea></div><button class="btn" onclick="addJob()">حفظ</button></div><div class="card s7"><h2>ملاحظة</h2><p class="muted">النسخة الحالية تسجل الشواغر يدويًا. الخطوة التالية هي إضافة موصلات بحث عامة ومسموح بها للوظائف.</p></div></div>'}
 function renderResearch(){document.getElementById("research").innerHTML='<div class="card"><h2>البحث</h2><p class="muted">أعط الوكيل سؤال البحث من صفحة الوكيل. سيحفظ المهمة والنتيجة.</p></div>'}
 function renderBusiness(){document.getElementById("business").innerHTML='<div class="card"><h2>الخدمات والأعمال</h2><p class="muted">اطلب من الوكيل ابتكار خدمة، اختبار الطلب عليها، إعداد العرض، وبناء خطة الوصول للعملاء.</p></div>'}
