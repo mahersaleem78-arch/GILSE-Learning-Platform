@@ -114,18 +114,18 @@ function renderAgent(){
 }
 async function runTask(){
  const input=document.getElementById("q"),q=input.value.trim();if(!q)return;
- messages.push({role:"user",text:q});saveChat();renderAgent();document.getElementById("agentStatus").textContent="الوكيل يخطط وينفذ...";
+ messages.push({role:"user",text:q});saveChat();renderAgent();
+ const status=document.getElementById("agentStatus"); if(status)status.textContent="Maher AI يفكر...";
  try{
-   const created=await call("tasks",{method:"POST",body:JSON.stringify({instruction:q})});
-   const result=await call("tasks/"+created.data.id+"/run",{method:"POST",body:"{}"});
-   tasks.unshift(result.data);
-   const r=result.data.result||{};
-   let text="اكتملت دورة الوكيل.\n\nالنوع: "+(r.type||"general");
-   if(r.plan?.steps)text+="\n\nالخطة:\n"+r.plan.steps.map((x,i)=>(i+1)+". "+x).join("\n");
-   if(r.actions?.length)text+="\n\nالإجراء:\n"+JSON.stringify(r.actions,null,2);
-   if(r.llm)text+="\n\nتحليل النموذج:\n"+r.llm;
-   messages.push({role:"agent",text});saveChat();renderAgent()
- }catch(e){messages.push({role:"agent",text:"تعذر التنفيذ: "+e.message});saveChat();renderAgent()}
+   const history=messages.slice(-21,-1).map(m=>({role:m.role==="agent"?"assistant":"user",content:m.text}));
+   const result=await call("chat",{method:"POST",body:JSON.stringify({message:q,history})});
+   const data=result.data||{};
+   messages.push({role:"agent",text:data.text||"لم يصل رد من النموذج."});
+   saveChat();renderAgent();
+ }catch(e){
+   messages.push({role:"agent",text:"تعذر الاتصال بالنموذج: "+e.message});
+   saveChat();renderAgent();
+ }
 }
 function renderTasks(){
  tasks=document.getElementById("tasks")?tasks:tasks;
